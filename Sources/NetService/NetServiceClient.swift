@@ -18,7 +18,7 @@ public protocol NetServiceClient: class {
                           foundService: @escaping (NetService) -> ()) throws
     
     /// Resolve the address of the specified net service.
-    func resolve(_ service: NetService, timeout: TimeInterval) throws -> [String]
+    func resolve(_ service: NetService, timeout: TimeInterval) throws -> [NetServiceAddress]
 }
 
 /// Net Service Error

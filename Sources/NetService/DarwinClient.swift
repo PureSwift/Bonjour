@@ -61,7 +61,7 @@ public final class DarwinNetServiceClient: NSObject, NetServiceClient {
         netServiceBrowser.stop()
     }
     
-    public func resolve(_ service: NetService, timeout: TimeInterval) throws -> [String] {
+    public func resolve(_ service: NetService, timeout: TimeInterval) throws -> [NetServiceAddress] {
         
         precondition(timeout > 0.0, "Cannot indefinitely resolve")
         
@@ -84,7 +84,8 @@ public final class DarwinNetServiceClient: NSObject, NetServiceClient {
         // wait
         try semaphore.wait()
         
-        netService.addresses
+        // return value
+        return (netService.addresses ?? []).compactMap { NetServiceAddress(data: $0) }
     }
 }
 
