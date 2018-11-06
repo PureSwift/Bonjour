@@ -24,14 +24,11 @@ public final class DarwinNetServiceClient: NSObject, NetServiceClient {
         return netServiceBrowser
     }()
     
-    private lazy var accessQueue: DispatchQueue = DispatchQueue(label: "\(type(of: self)) Access Queue", attributes: [])
-    
     private var internalState = InternalState()
     
     // MARK: - Initialization
     
     public override init() {
-        
         super.init()
     }
     
@@ -43,12 +40,9 @@ public final class DarwinNetServiceClient: NSObject, NetServiceClient {
                                  foundService: @escaping (Service) -> ()) throws {
         
         // remove previous results for domain and type
-        accessQueue.sync { [unowned self] in
-            
-            self.internalState.discoverServices.foundService = foundService
-            self.internalState.discoverServices.services = self.internalState.discoverServices.services
-                .filter { ($0.key.type == type && $0.key.domain == domain) == false }
-        }
+        self.internalState.discoverServices.foundService = foundService
+        self.internalState.discoverServices.services = self.internalState.discoverServices.services
+            .filter { ($0.key.type == type && $0.key.domain == domain) == false }
         
         // perform search
         netServiceBrowser.searchForServices(ofType: type.rawValue, inDomain: domain.rawValue)
@@ -65,31 +59,26 @@ public final class DarwinNetServiceClient: NSObject, NetServiceClient {
         
         precondition(timeout > 0.0, "Cannot indefinitely resolve")
         
-        let netService = try accessQueue.sync { [unowned self] () -> Foundation.NetService in
-            
-            guard let netService = self.internalState.discoverServices.services[service]
-                else { throw NetServiceClientError.invalidService(service) }
-            
-            return netService
-        }
+        guard let netService = self.internalState.discoverServices.services[service]
+            else { throw NetServiceClientError.invalidService(service) }
         
-        // store semaphore
-        let semaphore = Semaphore(timeout: timeout, operation: .resolve(service))
-        accessQueue.sync { [unowned self] in self.internalState.resolveAddress.semaphore = semaphore }
-        defer { accessQueue.sync { [unowned self] in self.internalState.resolveAddress.semaphore = nil } }
+        self.internalState.resolveAddress.didResolve = false
         
         // perform action
         netService.resolve(withTimeout: timeout)
         
-        // wait
-        //try semaphore.wait()
+        // run loop
         let end = Date() + timeout
-        while Date() < end {
+        while Date() < end && self.internalState.resolveAddress.didResolve == false {
             RunLoop.current.run(until: Date() + 1.0)
         }
         
+        // make sure the method did not timeout
+        guard self.internalState.resolveAddress.didResolve || Date() < end
+            else { throw NetServiceClientError.timeout }
+        
         // return value
-        return (netService.addresses ?? []).compactMap { NetServiceAddress(data: $0) }
+        return (netService.addresses ?? []).map { NetServiceAddress(data: $0) }
     }
 }
 
@@ -101,29 +90,21 @@ extension DarwinNetServiceClient: NetServiceBrowserDelegate {
     public func netServiceBrowserWillSearch(_ browser: NetServiceBrowser) {
         
         log?("Will search")
-        
-        
     }
     
     public func netServiceBrowserDidStopSearch(_ browser: NetServiceBrowser) {
         
         log?("Did stop search")
-        
-        
     }
     
     public func netServiceBrowser(_ browser: NetServiceBrowser, didNotSearch errorDict: [String : NSNumber]) {
         
         log?("Did not search: \(errorDict)")
-        
-        
     }
     
     public func netServiceBrowser(_ browser: NetServiceBrowser, didFindDomain domainString: String, moreComing: Bool) {
         
         log?("Did find domain \(domainString)" + (moreComing ? " (more coming)" : ""))
-        
-        
     }
     
     public func netServiceBrowser(_ browser: NetServiceBrowser, didFind service: Foundation.NetService, moreComing: Bool) {
@@ -136,25 +117,18 @@ extension DarwinNetServiceClient: NetServiceBrowserDelegate {
                                type: NetServiceType(rawValue: service.type)!,
                                name: service.name)
         
-        accessQueue.sync { [unowned self] in
-            
-            self.internalState.discoverServices.services[value] = service
-            self.internalState.discoverServices.foundService?(value)
-        }
+        self.internalState.discoverServices.services[value] = service
+        self.internalState.discoverServices.foundService?(value)
     }
     
     public func netServiceBrowser(_ browser: NetServiceBrowser, didRemoveDomain domainString: String, moreComing: Bool) {
         
         log?("Did remove domain \(domainString)" + (moreComing ? " (more coming)" : ""))
-        
-        
     }
     
     public func netServiceBrowser(_ browser: NetServiceBrowser, didRemove service: Foundation.NetService, moreComing: Bool) {
         
         log?("Did remove service \(service.domain) \(service.type) \(service.name)" + (moreComing ? " (more coming)" : ""))
-        
-        
     }
 }
 
@@ -191,20 +165,12 @@ extension DarwinNetServiceClient: NetServiceDelegate {
         
         log?("[\(service.domain)\(service.type)\(service.name)]: Did resolve")
         
-        accessQueue.sync { [unowned self] in
-            self.internalState.resolveAddress.semaphore?.stopWaiting()
-            self.internalState.resolveAddress.semaphore = nil
-        }
+        self.internalState.resolveAddress.didResolve = true
     }
     
     public func netService(_ service: Foundation.NetService, didNotResolve errorDict: [String : NSNumber]) {
         
         log?("[\(service.domain)\(service.type)\(service.name)]: Did not resolve \(errorDict)")
-        
-        accessQueue.sync { [unowned self] in
-            self.internalState.resolveAddress.semaphore?.stopWaiting(NetServiceClientError.timeout)
-            self.internalState.resolveAddress.semaphore = nil
-        }
     }
     
     public func netServiceDidStop(_ service: Foundation.NetService) {
@@ -240,50 +206,37 @@ private extension DarwinNetServiceClient {
             var didResolve: Bool = false
         }
     }
+}
+
+internal extension NetServiceAddress {
     
-    enum Operation {
+    init(data: Data) {
         
-        case discoverServices(NetServiceDomain, NetServiceType)
-        case resolve(Service)
-    }
-    
-    final class Semaphore {
+        var socketAddress = sockaddr_storage()
+        data.withUnsafeBytes { socketAddress = $0.pointee }
         
-        let operation: Operation
-        let semaphore: DispatchSemaphore
-        let timeout: TimeInterval
-        var error: Swift.Error?
+        switch Int32(socketAddress.ss_family) {
         
-        init(timeout: TimeInterval,
-             operation: Operation) {
-            
-            self.operation = operation
-            self.timeout = timeout
-            self.semaphore = DispatchSemaphore(value: 0)
-            self.error = nil
-        }
-        
-        func wait() throws {
-            
-            let dispatchTime: DispatchTime = .now() + timeout
-            
-            let success = semaphore.wait(timeout: dispatchTime) == .success
-            
-            if let error = self.error {
-                
-                throw error
+        case AF_INET:
+            let ipv4 = withUnsafePointer(to: &socketAddress) {
+                $0.withMemoryRebound(to: sockaddr_in.self, capacity: 1) {
+                    $0.pointee
+                }
             }
             
-            guard success else { throw NetServiceClientError.timeout }
-        }
-        
-        func stopWaiting(_ error: Swift.Error? = nil) {
+            self.init(port: ipv4.sin_port, address: .ipv4(NetServiceAddressIPv4(address: ipv4.sin_addr)))
             
-            // store signal
-            self.error = error
+        case AF_INET6:
+            let ipv6 = withUnsafePointer(to: &socketAddress) {
+                $0.withMemoryRebound(to: sockaddr_in6.self, capacity: 1) {
+                    $0.pointee
+                }
+            }
             
-            // stop blocking
-            semaphore.signal()
+            self.init(port: ipv6.sin6_port, address: .ipv6(NetServiceAddressIPv6(address: ipv6.sin6_addr)))
+            
+        default:
+            fatalError()
         }
     }
 }

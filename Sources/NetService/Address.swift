@@ -55,42 +55,6 @@ extension NetServiceAddress.Address: CustomStringConvertible {
     }
 }
 
-public extension NetServiceAddress {
-    
-    public init?(data: Data) {
-        
-        guard data.count == MemoryLayout<sockaddr_storage>.size
-            else { return nil }
-        
-        var socketAddress = sockaddr_storage()
-        data.withUnsafeBytes { socketAddress = $0.pointee }
-        
-        switch Int32(socketAddress.ss_family) {
-            
-        case AF_INET:
-            let ipv4 = withUnsafePointer(to: &socketAddress) {
-                $0.withMemoryRebound(to: sockaddr_in.self, capacity: 1) {
-                    $0.pointee
-                }
-            }
-            
-            self.init(port: ipv4.sin_port, address: .ipv4(NetServiceAddressIPv4(address: ipv4.sin_addr)))
-            
-        case AF_INET6:
-            let ipv6 = withUnsafePointer(to: &socketAddress) {
-                $0.withMemoryRebound(to: sockaddr_in6.self, capacity: 1) {
-                    $0.pointee
-                }
-            }
-            
-            self.init(port: ipv6.sin6_port, address: .ipv6(NetServiceAddressIPv6(address: ipv6.sin6_addr)))
-            
-        default:
-            fatalError()
-        }
-    }
-}
-
 public protocol NetServiceAddressProtocol {
     
     associatedtype SocketAddress
