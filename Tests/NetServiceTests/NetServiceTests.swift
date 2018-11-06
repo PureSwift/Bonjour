@@ -14,11 +14,15 @@ final class NetServiceTests: XCTestCase {
     
     static let allTests = [
         ("testIPv4Address", testIPv4Address),
+        ("testInvalidIPv4Address", testInvalidIPv4Address),
+        ("testIPv6Address", testIPv6Address),
+        ("testInvalidIPv6Address", testInvalidIPv6Address)
         ]
     
     func testIPv4Address() {
         
         let strings = [
+            "127.0.0.1",
             "192.168.0.110"
         ]
         
@@ -70,15 +74,31 @@ final class NetServiceTests: XCTestCase {
     
     #if os(macOS)
     
-    func testDarwinClient() {
+    func testDarwinAddressData() {
         
-        let client = DarwinNetServiceClient()
-        client.log = { print("NetService:", $0) }
+        let addressData = [
+            ("192.168.0.110:20480",
+             Data([16, 2, 0, 80, 192, 168, 0, 110, 0, 0, 0, 0, 0, 0, 0, 0])),
+            ("fe80::9eae:d3ff:fe97:92c5:20480",
+             Data([28, 30, 0, 80, 0, 0, 0, 0, 254, 128, 0, 0, 0, 0, 0, 0, 158, 174, 211, 255, 254, 151, 146, 197, 5, 0, 0, 0]))
+        ]
+        
+        for (string, data) in addressData {
+            
+            let address = NetServiceAddress(data: data)
+            XCTAssertEqual(address.description, string)
+        }
+    }
+    
+    func testDarwinClient() {        
         
         do {
             
+            let client = DarwinNetServiceClient()
+            client.log = { print("NetService:", $0) }
+            
             var services = Set<Service>()
-            let end = Date() + 2.0
+            let end = Date() + 1.0
             try client.discoverServices(of: .http,
                                         in: .local,
                                         shouldContinue: { Date() < end },
