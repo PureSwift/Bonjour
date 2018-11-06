@@ -9,7 +9,7 @@
 import Foundation
 
 /// Discovered Net Service
-public struct NetService: Equatable, Hashable {
+public struct Service: Equatable, Hashable {
     
     public let domain: NetServiceDomain
     

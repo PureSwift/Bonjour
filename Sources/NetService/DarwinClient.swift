@@ -40,7 +40,7 @@ public final class DarwinNetServiceClient: NSObject, NetServiceClient {
     public func discoverServices(of type: NetServiceType,
                                  in domain: NetServiceDomain,
                                  shouldContinue: () -> Bool,
-                                 foundService: @escaping (NetService) -> ()) throws {
+                                 foundService: @escaping (Service) -> ()) throws {
         
         // remove previous results for domain and type
         accessQueue.sync { [unowned self] in
@@ -55,13 +55,13 @@ public final class DarwinNetServiceClient: NSObject, NetServiceClient {
         
         // wait
         while shouldContinue() {
-            sleep(1)
+            RunLoop.current.run(until: Date() + 1.0)
         }
         
         netServiceBrowser.stop()
     }
     
-    public func resolve(_ service: NetService, timeout: TimeInterval) throws -> [NetServiceAddress] {
+    public func resolve(_ service: Service, timeout: TimeInterval) throws -> [NetServiceAddress] {
         
         precondition(timeout > 0.0, "Cannot indefinitely resolve")
         
@@ -82,7 +82,11 @@ public final class DarwinNetServiceClient: NSObject, NetServiceClient {
         netService.resolve(withTimeout: timeout)
         
         // wait
-        try semaphore.wait()
+        //try semaphore.wait()
+        let end = Date() + timeout
+        while Date() < end {
+            RunLoop.current.run(until: Date() + 1.0)
+        }
         
         // return value
         return (netService.addresses ?? []).compactMap { NetServiceAddress(data: $0) }
@@ -128,7 +132,7 @@ extension DarwinNetServiceClient: NetServiceBrowserDelegate {
         
         service.delegate = self
         
-        let value = NetService(domain: NetServiceDomain(rawValue: service.domain)!,
+        let value = Service(domain: NetServiceDomain(rawValue: service.domain)!,
                                type: NetServiceType(rawValue: service.type)!,
                                name: service.name)
         
@@ -224,23 +228,23 @@ private extension DarwinNetServiceClient {
         
         struct DiscoverServices {
             
-            var services = [NetService: Foundation.NetService]()
+            var services = [Service: Foundation.NetService]()
             
-            var foundService: ((NetService) -> ())?
+            var foundService: ((Service) -> ())?
         }
         
         var resolveAddress = ResolveAddress()
         
         struct ResolveAddress {
             
-            var semaphore: Semaphore?
+            var didResolve: Bool = false
         }
     }
     
     enum Operation {
         
         case discoverServices(NetServiceDomain, NetServiceType)
-        case resolve(NetService)
+        case resolve(Service)
     }
     
     final class Semaphore {
