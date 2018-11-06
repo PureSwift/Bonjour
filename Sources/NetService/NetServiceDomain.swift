@@ -8,6 +8,7 @@
 
 import Foundation
 
+/// Net Service Domain
 public struct NetServiceDomain: RawRepresentable, Equatable, Hashable {
     
     public let rawValue: String
@@ -21,14 +22,12 @@ public struct NetServiceDomain: RawRepresentable, Equatable, Hashable {
     }
     
     private init(_ unsafe: String) {
-        
         assert(NetServiceDomain(rawValue: unsafe) != nil)
-        
         self.rawValue = unsafe
     }
 }
 
 public extension NetServiceDomain {
     
-    public static var local: NetServiceDomain { return NetServiceDomain("local.") }
+    public static var local = NetServiceDomain("local.")
 }

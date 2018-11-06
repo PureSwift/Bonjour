@@ -53,6 +53,12 @@ public final class DarwinNetServiceClient: NSObject, NetServiceClient {
         }
         
         netServiceBrowser.stop()
+        RunLoop.current.run(until: Date() + 0.1)
+        
+        if let error = self.internalState.discoverServices.error {
+            
+            throw DarwinNetServiceClientError.notDiscoverServices(error)
+        }
     }
     
     public func resolve(_ service: Service, timeout: TimeInterval) throws -> [NetServiceAddress] {
@@ -62,15 +68,20 @@ public final class DarwinNetServiceClient: NSObject, NetServiceClient {
         guard let netService = self.internalState.discoverServices.services[service]
             else { throw NetServiceClientError.invalidService(service) }
         
-        self.internalState.resolveAddress.didResolve = false
-        
         // perform action
         netService.resolve(withTimeout: timeout)
         
         // run loop
         let end = Date() + timeout
-        while Date() < end && self.internalState.resolveAddress.didResolve == false {
+        while Date() < end
+            && self.internalState.resolveAddress.didResolve == false
+            && self.internalState.resolveAddress.error == nil {
             RunLoop.current.run(until: Date() + 1.0)
+        }
+        
+        if let error = self.internalState.resolveAddress.error {
+            
+            throw DarwinNetServiceClientError.notResolveAddress(error)
         }
         
         // make sure the method did not timeout
@@ -82,6 +93,14 @@ public final class DarwinNetServiceClient: NSObject, NetServiceClient {
     }
 }
 
+// MARK: - Error
+
+public enum DarwinNetServiceClientError: Error {
+    
+    case notDiscoverServices([String: NSNumber])
+    case notResolveAddress([String: NSNumber])
+}
+
 // MARK: - NetServiceBrowserDelegate
 
 @objc
@@ -90,6 +109,8 @@ extension DarwinNetServiceClient: NetServiceBrowserDelegate {
     public func netServiceBrowserWillSearch(_ browser: NetServiceBrowser) {
         
         log?("Will search")
+        
+        self.internalState.discoverServices.error = nil
     }
     
     public func netServiceBrowserDidStopSearch(_ browser: NetServiceBrowser) {
@@ -100,11 +121,8 @@ extension DarwinNetServiceClient: NetServiceBrowserDelegate {
     public func netServiceBrowser(_ browser: NetServiceBrowser, didNotSearch errorDict: [String : NSNumber]) {
         
         log?("Did not search: \(errorDict)")
-    }
-    
-    public func netServiceBrowser(_ browser: NetServiceBrowser, didFindDomain domainString: String, moreComing: Bool) {
         
-        log?("Did find domain \(domainString)" + (moreComing ? " (more coming)" : ""))
+        self.internalState.discoverServices.error = errorDict
     }
     
     public func netServiceBrowser(_ browser: NetServiceBrowser, didFind service: Foundation.NetService, moreComing: Bool) {
@@ -120,45 +138,20 @@ extension DarwinNetServiceClient: NetServiceBrowserDelegate {
         self.internalState.discoverServices.services[value] = service
         self.internalState.discoverServices.foundService?(value)
     }
-    
-    public func netServiceBrowser(_ browser: NetServiceBrowser, didRemoveDomain domainString: String, moreComing: Bool) {
-        
-        log?("Did remove domain \(domainString)" + (moreComing ? " (more coming)" : ""))
-    }
-    
-    public func netServiceBrowser(_ browser: NetServiceBrowser, didRemove service: Foundation.NetService, moreComing: Bool) {
-        
-        log?("Did remove service \(service.domain) \(service.type) \(service.name)" + (moreComing ? " (more coming)" : ""))
-    }
 }
 
 // MARK: - NetServiceDelegate
 
 @objc
 extension DarwinNetServiceClient: NetServiceDelegate {
-
-    public func netServiceWillPublish(_ service: Foundation.NetService) {
-        
-        log?("[\(service.domain)\(service.type)\(service.name)]: Will publish")
-    }
-    
-    public func netServiceDidPublish(_ service: Foundation.NetService) {
-        
-        log?("[\(service.domain)\(service.type)\(service.name)]: Did publish")
-    }
-    
-    
-    public func netService(_ service: Foundation.NetService, didNotPublish errorDict: [String : NSNumber]) {
-        
-        log?("[\(service.domain)\(service.type)\(service.name)]: Did not publish \(errorDict)")
-    }
-    
     
     public func netServiceWillResolve(_ service: Foundation.NetService) {
         
         log?("[\(service.domain)\(service.type)\(service.name)]: Will resolve")
+        
+        self.internalState.resolveAddress.didResolve = false
+        self.internalState.resolveAddress.error = nil
     }
-    
     
     public func netServiceDidResolveAddress(_ service: Foundation.NetService) {
         
@@ -170,16 +163,8 @@ extension DarwinNetServiceClient: NetServiceDelegate {
     public func netService(_ service: Foundation.NetService, didNotResolve errorDict: [String : NSNumber]) {
         
         log?("[\(service.domain)\(service.type)\(service.name)]: Did not resolve \(errorDict)")
-    }
-    
-    public func netServiceDidStop(_ service: Foundation.NetService) {
         
-        log?("[\(service.domain)\(service.type)\(service.name)]: Did stop")
-    }
-    
-    public func netService(_ service: Foundation.NetService, didUpdateTXTRecord data: Data) {
-        
-        log?("[\(service.domain)\(service.type)\(service.name)]: Did udpate TXT record")
+        self.internalState.resolveAddress.error = errorDict
     }
 }
 
@@ -196,6 +181,8 @@ private extension DarwinNetServiceClient {
             var services = [Service: Foundation.NetService]()
             
             var foundService: ((Service) -> ())?
+            
+            var error: [String: NSNumber]?
         }
         
         var resolveAddress = ResolveAddress()
@@ -203,6 +190,8 @@ private extension DarwinNetServiceClient {
         struct ResolveAddress {
             
             var didResolve: Bool = false
+            
+            var error: [String: NSNumber]?
         }
     }
 }

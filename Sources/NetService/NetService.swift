@@ -16,6 +16,4 @@ public struct Service: Equatable, Hashable {
     public let type: NetServiceType
     
     public let name: String
-    
-    
 }
