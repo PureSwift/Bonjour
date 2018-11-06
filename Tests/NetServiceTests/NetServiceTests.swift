@@ -32,6 +32,8 @@ final class NetServiceTests: XCTestCase {
                 else { XCTFail("Invalid string \(string)"); return }
             
             XCTAssertEqual(address.description, string)
+            XCTAssertEqual(address, address)
+            XCTAssertEqual(address.hashValue, address.hashValue)
         }
     }
     
@@ -58,6 +60,8 @@ final class NetServiceTests: XCTestCase {
                 else { XCTFail("Invalid string \(string)"); return }
             
             XCTAssertEqual(address.description, string)
+            XCTAssertEqual(address, address)
+            XCTAssertEqual(address.hashValue, address.hashValue)
         }
     }
     

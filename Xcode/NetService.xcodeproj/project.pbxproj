@@ -24,10 +24,10 @@
 		6E74524C21913DAB00CE1FCA /* DarwinClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E74524A21913DAB00CE1FCA /* DarwinClient.swift */; };
 		6E74524D21913DAB00CE1FCA /* DarwinClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E74524A21913DAB00CE1FCA /* DarwinClient.swift */; };
 		6E74524E21913DAB00CE1FCA /* DarwinClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E74524A21913DAB00CE1FCA /* DarwinClient.swift */; };
-		6E7452502191596F00CE1FCA /* Address.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E74524F2191596F00CE1FCA /* Address.swift */; };
-		6E7452512191596F00CE1FCA /* Address.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E74524F2191596F00CE1FCA /* Address.swift */; };
-		6E7452522191596F00CE1FCA /* Address.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E74524F2191596F00CE1FCA /* Address.swift */; };
-		6E7452532191596F00CE1FCA /* Address.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E74524F2191596F00CE1FCA /* Address.swift */; };
+		6E7452502191596F00CE1FCA /* NetServiceAddress.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E74524F2191596F00CE1FCA /* NetServiceAddress.swift */; };
+		6E7452512191596F00CE1FCA /* NetServiceAddress.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E74524F2191596F00CE1FCA /* NetServiceAddress.swift */; };
+		6E7452522191596F00CE1FCA /* NetServiceAddress.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E74524F2191596F00CE1FCA /* NetServiceAddress.swift */; };
+		6E7452532191596F00CE1FCA /* NetServiceAddress.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E74524F2191596F00CE1FCA /* NetServiceAddress.swift */; };
 		8933C7851EB5B820000D00A4 /* NetService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8933C7841EB5B820000D00A4 /* NetService.swift */; };
 		8933C7861EB5B820000D00A4 /* NetService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8933C7841EB5B820000D00A4 /* NetService.swift */; };
 		8933C7871EB5B820000D00A4 /* NetService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8933C7841EB5B820000D00A4 /* NetService.swift */; };
@@ -73,7 +73,7 @@
 		6E74524021913CF500CE1FCA /* NetServiceType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetServiceType.swift; sourceTree = "<group>"; };
 		6E74524521913D0400CE1FCA /* NetServiceDomain.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetServiceDomain.swift; sourceTree = "<group>"; };
 		6E74524A21913DAB00CE1FCA /* DarwinClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DarwinClient.swift; sourceTree = "<group>"; };
-		6E74524F2191596F00CE1FCA /* Address.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Address.swift; sourceTree = "<group>"; };
+		6E74524F2191596F00CE1FCA /* NetServiceAddress.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetServiceAddress.swift; sourceTree = "<group>"; };
 		8933C7841EB5B820000D00A4 /* NetService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetService.swift; sourceTree = "<group>"; };
 		8933C7891EB5B82A000D00A4 /* NetServiceTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetServiceTests.swift; sourceTree = "<group>"; };
 		AD2FAA261CD0B6D800659CF4 /* NetService.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = NetService.plist; sourceTree = "<group>"; };
@@ -178,7 +178,7 @@
 				6E74523B21913CE800CE1FCA /* NetServiceClient.swift */,
 				6E74524021913CF500CE1FCA /* NetServiceType.swift */,
 				6E74524521913D0400CE1FCA /* NetServiceDomain.swift */,
-				6E74524F2191596F00CE1FCA /* Address.swift */,
+				6E74524F2191596F00CE1FCA /* NetServiceAddress.swift */,
 				6E74524A21913DAB00CE1FCA /* DarwinClient.swift */,
 			);
 			name = Sources;
@@ -490,7 +490,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				6E7452502191596F00CE1FCA /* Address.swift in Sources */,
+				6E7452502191596F00CE1FCA /* NetServiceAddress.swift in Sources */,
 				6E74524121913CF500CE1FCA /* NetServiceType.swift in Sources */,
 				6E74524621913D0400CE1FCA /* NetServiceDomain.swift in Sources */,
 				6E74523C21913CE800CE1FCA /* NetServiceClient.swift in Sources */,
@@ -511,7 +511,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				6E7452522191596F00CE1FCA /* Address.swift in Sources */,
+				6E7452522191596F00CE1FCA /* NetServiceAddress.swift in Sources */,
 				6E74524321913CF500CE1FCA /* NetServiceType.swift in Sources */,
 				6E74524821913D0400CE1FCA /* NetServiceDomain.swift in Sources */,
 				6E74523E21913CE800CE1FCA /* NetServiceClient.swift in Sources */,
@@ -524,7 +524,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				6E7452532191596F00CE1FCA /* Address.swift in Sources */,
+				6E7452532191596F00CE1FCA /* NetServiceAddress.swift in Sources */,
 				6E74524421913CF500CE1FCA /* NetServiceType.swift in Sources */,
 				6E74524921913D0400CE1FCA /* NetServiceDomain.swift in Sources */,
 				6E74523F21913CE800CE1FCA /* NetServiceClient.swift in Sources */,
@@ -537,7 +537,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				6E7452512191596F00CE1FCA /* Address.swift in Sources */,
+				6E7452512191596F00CE1FCA /* NetServiceAddress.swift in Sources */,
 				6E74524221913CF500CE1FCA /* NetServiceType.swift in Sources */,
 				6E74524721913D0400CE1FCA /* NetServiceDomain.swift in Sources */,
 				6E74523D21913CE800CE1FCA /* NetServiceClient.swift in Sources */,
@@ -679,6 +679,7 @@
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = fast;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNDECLARED_SELECTOR = YES;

@@ -142,7 +142,6 @@ extension DarwinNetServiceClient: NetServiceDelegate {
         log?("[\(service.domain)\(service.type)\(service.name)]: Will publish")
     }
     
-    
     public func netServiceDidPublish(_ service: Foundation.NetService) {
         
         log?("[\(service.domain)\(service.type)\(service.name)]: Did publish")
