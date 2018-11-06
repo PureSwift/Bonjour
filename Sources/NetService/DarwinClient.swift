@@ -11,19 +11,22 @@ import Dispatch
 
 #if os(macOS) || os(iOS)
 
-@objc public final class DarwinNetServiceClient: NSObject, NetServiceClient {
+@objc(NetServiceClient)
+public final class DarwinNetServiceClient: NSObject, NetServiceClient {
     
     // MARK: - Properties
     
     public var log: ((String) -> ())?
     
-    internal lazy var netServiceBrowser: NetServiceBrowser = {
+    private lazy var netServiceBrowser: NetServiceBrowser = {
         let netServiceBrowser = NetServiceBrowser()
         netServiceBrowser.delegate = self
         return netServiceBrowser
     }()
     
-    private var discoveredServices = [NetService: Foundation.NetService]()
+    private lazy var accessQueue: DispatchQueue = DispatchQueue(label: "\(type(of: self)) Access Queue", attributes: [])
+    
+    private var internalState = InternalState()
     
     // MARK: - Initialization
     
@@ -37,11 +40,14 @@ import Dispatch
     public func discoverServices(of type: NetServiceType,
                                  in domain: NetServiceDomain,
                                  shouldContinue: () -> Bool,
-                                 service: (NetService) -> ()) throws {
+                                 foundService: @escaping (NetService) -> ()) throws {
         
         // remove previous results for domain and type
-        discoveredServices = discoveredServices.filter {
-            $0.key.type == type && $0.key.domain == domain
+        accessQueue.sync { [unowned self] in
+            
+            self.internalState.discoverServices.foundService = foundService
+            self.internalState.discoverServices.services = self.internalState.discoverServices.services
+                .filter { ($0.key.type == type && $0.key.domain == domain) == false }
         }
         
         // perform search
@@ -53,26 +59,36 @@ import Dispatch
         }
         
         netServiceBrowser.stop()
-        
-        // return results
-        /*
-        return Array(
-            discoveredServices
-            .filter { $0.key.type == type && $0.key.domain == domain }
-            .keys
-        )*/
     }
     
     public func resolve(_ service: NetService, timeout: TimeInterval) throws -> [String] {
         
         precondition(timeout > 0.0, "Cannot indefinitely resolve")
         
-        guard let netService = discoveredServices[service]
-            else { throw NetServiceClientError.invalidService(service) }
+        let netService = try accessQueue.sync { [unowned self] () -> Foundation.NetService in
+            
+            guard let netService = self.internalState.discoverServices.services[service]
+                else { throw NetServiceClientError.invalidService(service) }
+            
+            return netService
+        }
         
+        // store semaphore
+        let semaphore = Semaphore(timeout: timeout, operation: .resolve(service))
+        accessQueue.sync { [unowned self] in self.internalState.resolveAddress.semaphore = semaphore }
+        defer { accessQueue.sync { [unowned self] in self.internalState.resolveAddress.semaphore = nil } }
+        
+        // perform action
         netService.resolve(withTimeout: timeout)
+        
+        // wait
+        try semaphore.wait()
+        
+        netService.addresses
     }
 }
+
+// MARK: - NetServiceBrowserDelegate
 
 @objc
 extension DarwinNetServiceClient: NetServiceBrowserDelegate {
@@ -110,6 +126,16 @@ extension DarwinNetServiceClient: NetServiceBrowserDelegate {
         log?("Did find service \(service.domain) \(service.type) \(service.name)" + (moreComing ? " (more coming)" : ""))
         
         service.delegate = self
+        
+        let value = NetService(domain: NetServiceDomain(rawValue: service.domain)!,
+                               type: NetServiceType(rawValue: service.type)!,
+                               name: service.name)
+        
+        accessQueue.sync { [unowned self] in
+            
+            self.internalState.discoverServices.services[value] = service
+            self.internalState.discoverServices.foundService?(value)
+        }
     }
     
     public func netServiceBrowser(_ browser: NetServiceBrowser, didRemoveDomain domainString: String, moreComing: Bool) {
@@ -126,6 +152,8 @@ extension DarwinNetServiceClient: NetServiceBrowserDelegate {
         
     }
 }
+
+// MARK: - NetServiceDelegate
 
 @objc
 extension DarwinNetServiceClient: NetServiceDelegate {
@@ -157,14 +185,22 @@ extension DarwinNetServiceClient: NetServiceDelegate {
     public func netServiceDidResolveAddress(_ service: Foundation.NetService) {
         
         log?("[\(service.domain)\(service.type)\(service.name)]: Did resolve")
+        
+        accessQueue.sync { [unowned self] in
+            self.internalState.resolveAddress.semaphore?.stopWaiting()
+            self.internalState.resolveAddress.semaphore = nil
+        }
     }
-    
     
     public func netService(_ service: Foundation.NetService, didNotResolve errorDict: [String : NSNumber]) {
         
         log?("[\(service.domain)\(service.type)\(service.name)]: Did not resolve \(errorDict)")
+        
+        accessQueue.sync { [unowned self] in
+            self.internalState.resolveAddress.semaphore?.stopWaiting(NetServiceClientError.timeout)
+            self.internalState.resolveAddress.semaphore = nil
+        }
     }
-    
     
     public func netServiceDidStop(_ service: Foundation.NetService) {
         
@@ -174,6 +210,76 @@ extension DarwinNetServiceClient: NetServiceDelegate {
     public func netService(_ service: Foundation.NetService, didUpdateTXTRecord data: Data) {
         
         log?("[\(service.domain)\(service.type)\(service.name)]: Did udpate TXT record")
+    }
+}
+
+// MARK: - Private Types
+
+private extension DarwinNetServiceClient {
+    
+    struct InternalState {
+        
+        var discoverServices = DiscoverServices()
+        
+        struct DiscoverServices {
+            
+            var services = [NetService: Foundation.NetService]()
+            
+            var foundService: ((NetService) -> ())?
+        }
+        
+        var resolveAddress = ResolveAddress()
+        
+        struct ResolveAddress {
+            
+            var semaphore: Semaphore?
+        }
+    }
+    
+    enum Operation {
+        
+        case discoverServices(NetServiceDomain, NetServiceType)
+        case resolve(NetService)
+    }
+    
+    final class Semaphore {
+        
+        let operation: Operation
+        let semaphore: DispatchSemaphore
+        let timeout: TimeInterval
+        var error: Swift.Error?
+        
+        init(timeout: TimeInterval,
+             operation: Operation) {
+            
+            self.operation = operation
+            self.timeout = timeout
+            self.semaphore = DispatchSemaphore(value: 0)
+            self.error = nil
+        }
+        
+        func wait() throws {
+            
+            let dispatchTime: DispatchTime = .now() + timeout
+            
+            let success = semaphore.wait(timeout: dispatchTime) == .success
+            
+            if let error = self.error {
+                
+                throw error
+            }
+            
+            guard success else { throw NetServiceClientError.timeout }
+        }
+        
+        func stopWaiting(_ error: Swift.Error? = nil) {
+            
+            // store signal
+            self.error = error
+            
+            // stop blocking
+            semaphore.signal()
+        }
     }
 }
 

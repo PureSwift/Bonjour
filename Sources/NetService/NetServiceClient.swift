@@ -14,14 +14,18 @@ public protocol NetServiceClient: class {
     /// Discover services of the specified type in the specified domain.
     func discoverServices(of type: NetServiceType,
                           in domain: NetServiceDomain,
-                          timeout: TimeInterval) throws -> [NetService]
+                          shouldContinue: () -> Bool,
+                          foundService: @escaping (NetService) -> ()) throws
     
     /// Resolve the address of the specified net service.
-    func resolve(_ service: NetService) throws -> [String]
+    func resolve(_ service: NetService, timeout: TimeInterval) throws -> [String]
 }
 
 /// Net Service Error
 public enum NetServiceClientError: Error {
+    
+    /// Operation timed out.
+    case timeout
     
     /// Invalid / Unknown service specified.
     case invalidService(NetService)

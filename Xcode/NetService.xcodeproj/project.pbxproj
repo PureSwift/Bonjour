@@ -61,7 +61,7 @@
 
 /* Begin PBXFileReference section */
 		52D6D97C1BEFF229002C0205 /* NetService.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = NetService.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		52D6D9861BEFF229002C0205 /* NetService-iOS Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "NetService-iOS Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		52D6D9861BEFF229002C0205 /* NetServiceTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NetServiceTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		52D6D9E21BEFFF6E002C0205 /* NetService.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = NetService.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		52D6D9F01BEFFFBE002C0205 /* NetService.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = NetService.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		52D6DA0F1BF000BD002C0205 /* NetService.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = NetService.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -73,8 +73,8 @@
 		8933C7891EB5B82A000D00A4 /* NetServiceTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetServiceTests.swift; sourceTree = "<group>"; };
 		AD2FAA261CD0B6D800659CF4 /* NetService.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = NetService.plist; sourceTree = "<group>"; };
 		AD2FAA281CD0B6E100659CF4 /* NetServiceTests.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = NetServiceTests.plist; sourceTree = "<group>"; };
-		DD75027A1C68FCFC006590AF /* NetService-macOS Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "NetService-macOS Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
-		DD75028D1C690C7A006590AF /* NetService-tvOS Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "NetService-tvOS Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		DD75027A1C68FCFC006590AF /* NetServiceTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NetServiceTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		DD75028D1C690C7A006590AF /* NetServiceTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NetServiceTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -147,12 +147,12 @@
 			isa = PBXGroup;
 			children = (
 				52D6D97C1BEFF229002C0205 /* NetService.framework */,
-				52D6D9861BEFF229002C0205 /* NetService-iOS Tests.xctest */,
+				52D6D9861BEFF229002C0205 /* NetServiceTests.xctest */,
 				52D6D9E21BEFFF6E002C0205 /* NetService.framework */,
 				52D6D9F01BEFFFBE002C0205 /* NetService.framework */,
 				52D6DA0F1BF000BD002C0205 /* NetService.framework */,
-				DD75027A1C68FCFC006590AF /* NetService-macOS Tests.xctest */,
-				DD75028D1C690C7A006590AF /* NetService-tvOS Tests.xctest */,
+				DD75027A1C68FCFC006590AF /* NetServiceTests.xctest */,
+				DD75028D1C690C7A006590AF /* NetServiceTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -271,7 +271,7 @@
 			);
 			name = "NetService-iOS Tests";
 			productName = NetServiceTests;
-			productReference = 52D6D9861BEFF229002C0205 /* NetService-iOS Tests.xctest */;
+			productReference = 52D6D9861BEFF229002C0205 /* NetServiceTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
 		52D6D9E11BEFFF6E002C0205 /* NetService-watchOS */ = {
@@ -343,7 +343,7 @@
 			);
 			name = "NetService-macOS Tests";
 			productName = "NetService-OS Tests";
-			productReference = DD75027A1C68FCFC006590AF /* NetService-macOS Tests.xctest */;
+			productReference = DD75027A1C68FCFC006590AF /* NetServiceTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
 		DD75028C1C690C7A006590AF /* NetService-tvOS Tests */ = {
@@ -361,7 +361,7 @@
 			);
 			name = "NetService-tvOS Tests";
 			productName = "NetService-tvOS Tests";
-			productReference = DD75028D1C690C7A006590AF /* NetService-tvOS Tests.xctest */;
+			productReference = DD75028D1C690C7A006590AF /* NetServiceTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
 /* End PBXNativeTarget section */
@@ -732,7 +732,7 @@
 				INFOPLIST_FILE = Configs/NetServiceTests.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = org.pureswift.NetServiceTests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = NetServiceTests;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 4.0;
 			};
@@ -745,7 +745,7 @@
 				INFOPLIST_FILE = Configs/NetServiceTests.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = org.pureswift.NetServiceTests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = NetServiceTests;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
 				SWIFT_VERSION = 4.0;
 			};
@@ -891,7 +891,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
 				PRODUCT_BUNDLE_IDENTIFIER = org.pureswift.NetServiceTests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = NetServiceTests;
 				SDKROOT = macosx;
 				SWIFT_VERSION = 4.0;
 			};
@@ -906,7 +906,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
 				PRODUCT_BUNDLE_IDENTIFIER = org.pureswift.NetServiceTests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = NetServiceTests;
 				SDKROOT = macosx;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
 				SWIFT_VERSION = 4.0;
@@ -919,7 +919,7 @@
 				INFOPLIST_FILE = Configs/NetServiceTests.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = org.pureswift.NetServiceTests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = NetServiceTests;
 				SDKROOT = appletvos;
 				SWIFT_VERSION = 4.0;
 				TVOS_DEPLOYMENT_TARGET = 9.1;
@@ -932,7 +932,7 @@
 				INFOPLIST_FILE = Configs/NetServiceTests.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = org.pureswift.NetServiceTests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = NetServiceTests;
 				SDKROOT = appletvos;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
 				SWIFT_VERSION = 4.0;
