@@ -13,11 +13,59 @@ import XCTest
 final class NetServiceTests: XCTestCase {
     
     static let allTests = [
-        ("testExample", testExample),
+        ("testIPv4Address", testIPv4Address),
         ]
     
-    func testExample() {
+    func testIPv4Address() {
         
+        let strings = [
+            "192.168.0.110"
+        ]
+        
+        for string in strings {
+            
+            guard let address = NetServiceAddressIPv4(rawValue: string)
+                else { XCTFail("Invalid string \(string)"); return }
+            
+            XCTAssertEqual(address.description, string)
+        }
+    }
+    
+    func testInvalidIPv4Address() {
+        
+        let strings = [
+            "",
+            "fe80::9eae:d3ff:fe97:92c5",
+            "192.168.0.110."
+        ]
+        
+        strings.forEach { XCTAssertNil(NetServiceAddressIPv4(rawValue: $0)) }
+    }
+    
+    func testIPv6Address() {
+        
+        let strings = [
+            "fe80::9eae:d3ff:fe97:92c5"
+        ]
+        
+        for string in strings {
+            
+            guard let address = NetServiceAddressIPv6(rawValue: string)
+                else { XCTFail("Invalid string \(string)"); return }
+            
+            XCTAssertEqual(address.description, string)
+        }
+    }
+    
+    func testInvalidIPv6Address() {
+        
+        let strings = [
+            "",
+            ":9eae:d3ff:fe97:92c5",
+            "192.168.0.110"
+        ]
+        
+        strings.forEach { XCTAssertNil(NetServiceAddressIPv6(rawValue: $0)) }
     }
     
     #if os(macOS)
