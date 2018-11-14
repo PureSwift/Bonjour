@@ -8,30 +8,30 @@
 
 /* Begin PBXBuildFile section */
 		52D6D9871BEFF229002C0205 /* NetService.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 52D6D97C1BEFF229002C0205 /* NetService.framework */; };
-		6E74523C21913CE800CE1FCA /* NetServiceClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E74523B21913CE800CE1FCA /* NetServiceClient.swift */; };
-		6E74523D21913CE800CE1FCA /* NetServiceClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E74523B21913CE800CE1FCA /* NetServiceClient.swift */; };
-		6E74523E21913CE800CE1FCA /* NetServiceClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E74523B21913CE800CE1FCA /* NetServiceClient.swift */; };
-		6E74523F21913CE800CE1FCA /* NetServiceClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E74523B21913CE800CE1FCA /* NetServiceClient.swift */; };
-		6E74524121913CF500CE1FCA /* NetServiceType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E74524021913CF500CE1FCA /* NetServiceType.swift */; };
-		6E74524221913CF500CE1FCA /* NetServiceType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E74524021913CF500CE1FCA /* NetServiceType.swift */; };
-		6E74524321913CF500CE1FCA /* NetServiceType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E74524021913CF500CE1FCA /* NetServiceType.swift */; };
-		6E74524421913CF500CE1FCA /* NetServiceType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E74524021913CF500CE1FCA /* NetServiceType.swift */; };
-		6E74524621913D0400CE1FCA /* NetServiceDomain.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E74524521913D0400CE1FCA /* NetServiceDomain.swift */; };
-		6E74524721913D0400CE1FCA /* NetServiceDomain.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E74524521913D0400CE1FCA /* NetServiceDomain.swift */; };
-		6E74524821913D0400CE1FCA /* NetServiceDomain.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E74524521913D0400CE1FCA /* NetServiceDomain.swift */; };
-		6E74524921913D0400CE1FCA /* NetServiceDomain.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E74524521913D0400CE1FCA /* NetServiceDomain.swift */; };
-		6E74524B21913DAB00CE1FCA /* DarwinClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E74524A21913DAB00CE1FCA /* DarwinClient.swift */; };
-		6E74524C21913DAB00CE1FCA /* DarwinClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E74524A21913DAB00CE1FCA /* DarwinClient.swift */; };
-		6E74524D21913DAB00CE1FCA /* DarwinClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E74524A21913DAB00CE1FCA /* DarwinClient.swift */; };
-		6E74524E21913DAB00CE1FCA /* DarwinClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E74524A21913DAB00CE1FCA /* DarwinClient.swift */; };
-		6E7452502191596F00CE1FCA /* NetServiceAddress.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E74524F2191596F00CE1FCA /* NetServiceAddress.swift */; };
-		6E7452512191596F00CE1FCA /* NetServiceAddress.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E74524F2191596F00CE1FCA /* NetServiceAddress.swift */; };
-		6E7452522191596F00CE1FCA /* NetServiceAddress.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E74524F2191596F00CE1FCA /* NetServiceAddress.swift */; };
-		6E7452532191596F00CE1FCA /* NetServiceAddress.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E74524F2191596F00CE1FCA /* NetServiceAddress.swift */; };
-		8933C7851EB5B820000D00A4 /* NetService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8933C7841EB5B820000D00A4 /* NetService.swift */; };
-		8933C7861EB5B820000D00A4 /* NetService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8933C7841EB5B820000D00A4 /* NetService.swift */; };
-		8933C7871EB5B820000D00A4 /* NetService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8933C7841EB5B820000D00A4 /* NetService.swift */; };
-		8933C7881EB5B820000D00A4 /* NetService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8933C7841EB5B820000D00A4 /* NetService.swift */; };
+		6ECFC6FD219BD2AA009211BA /* ServiceType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6ECFC6F7219BD2A7009211BA /* ServiceType.swift */; };
+		6ECFC6FE219BD2AA009211BA /* ServiceType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6ECFC6F7219BD2A7009211BA /* ServiceType.swift */; };
+		6ECFC6FF219BD2AA009211BA /* ServiceType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6ECFC6F7219BD2A7009211BA /* ServiceType.swift */; };
+		6ECFC700219BD2AA009211BA /* ServiceType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6ECFC6F7219BD2A7009211BA /* ServiceType.swift */; };
+		6ECFC701219BD2AA009211BA /* Client.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6ECFC6F8219BD2A9009211BA /* Client.swift */; };
+		6ECFC702219BD2AA009211BA /* Client.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6ECFC6F8219BD2A9009211BA /* Client.swift */; };
+		6ECFC703219BD2AA009211BA /* Client.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6ECFC6F8219BD2A9009211BA /* Client.swift */; };
+		6ECFC704219BD2AA009211BA /* Client.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6ECFC6F8219BD2A9009211BA /* Client.swift */; };
+		6ECFC705219BD2AA009211BA /* Domain.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6ECFC6F9219BD2AA009211BA /* Domain.swift */; };
+		6ECFC706219BD2AA009211BA /* Domain.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6ECFC6F9219BD2AA009211BA /* Domain.swift */; };
+		6ECFC707219BD2AA009211BA /* Domain.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6ECFC6F9219BD2AA009211BA /* Domain.swift */; };
+		6ECFC708219BD2AA009211BA /* Domain.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6ECFC6F9219BD2AA009211BA /* Domain.swift */; };
+		6ECFC709219BD2AA009211BA /* Address.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6ECFC6FA219BD2AA009211BA /* Address.swift */; };
+		6ECFC70A219BD2AA009211BA /* Address.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6ECFC6FA219BD2AA009211BA /* Address.swift */; };
+		6ECFC70B219BD2AA009211BA /* Address.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6ECFC6FA219BD2AA009211BA /* Address.swift */; };
+		6ECFC70C219BD2AA009211BA /* Address.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6ECFC6FA219BD2AA009211BA /* Address.swift */; };
+		6ECFC70D219BD2AA009211BA /* NetService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6ECFC6FB219BD2AA009211BA /* NetService.swift */; };
+		6ECFC70E219BD2AA009211BA /* NetService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6ECFC6FB219BD2AA009211BA /* NetService.swift */; };
+		6ECFC70F219BD2AA009211BA /* NetService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6ECFC6FB219BD2AA009211BA /* NetService.swift */; };
+		6ECFC710219BD2AA009211BA /* NetService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6ECFC6FB219BD2AA009211BA /* NetService.swift */; };
+		6ECFC711219BD2AA009211BA /* DarwinClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6ECFC6FC219BD2AA009211BA /* DarwinClient.swift */; };
+		6ECFC712219BD2AA009211BA /* DarwinClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6ECFC6FC219BD2AA009211BA /* DarwinClient.swift */; };
+		6ECFC713219BD2AA009211BA /* DarwinClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6ECFC6FC219BD2AA009211BA /* DarwinClient.swift */; };
+		6ECFC714219BD2AA009211BA /* DarwinClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6ECFC6FC219BD2AA009211BA /* DarwinClient.swift */; };
 		8933C78E1EB5B82C000D00A4 /* NetServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8933C7891EB5B82A000D00A4 /* NetServiceTests.swift */; };
 		8933C78F1EB5B82C000D00A4 /* NetServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8933C7891EB5B82A000D00A4 /* NetServiceTests.swift */; };
 		8933C7901EB5B82D000D00A4 /* NetServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8933C7891EB5B82A000D00A4 /* NetServiceTests.swift */; };
@@ -69,12 +69,12 @@
 		52D6D9E21BEFFF6E002C0205 /* NetService.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = NetService.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		52D6D9F01BEFFFBE002C0205 /* NetService.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = NetService.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		52D6DA0F1BF000BD002C0205 /* NetService.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = NetService.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		6E74523B21913CE800CE1FCA /* NetServiceClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetServiceClient.swift; sourceTree = "<group>"; };
-		6E74524021913CF500CE1FCA /* NetServiceType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetServiceType.swift; sourceTree = "<group>"; };
-		6E74524521913D0400CE1FCA /* NetServiceDomain.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetServiceDomain.swift; sourceTree = "<group>"; };
-		6E74524A21913DAB00CE1FCA /* DarwinClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DarwinClient.swift; sourceTree = "<group>"; };
-		6E74524F2191596F00CE1FCA /* NetServiceAddress.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetServiceAddress.swift; sourceTree = "<group>"; };
-		8933C7841EB5B820000D00A4 /* NetService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetService.swift; sourceTree = "<group>"; };
+		6ECFC6F7219BD2A7009211BA /* ServiceType.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ServiceType.swift; sourceTree = "<group>"; };
+		6ECFC6F8219BD2A9009211BA /* Client.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Client.swift; sourceTree = "<group>"; };
+		6ECFC6F9219BD2AA009211BA /* Domain.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Domain.swift; sourceTree = "<group>"; };
+		6ECFC6FA219BD2AA009211BA /* Address.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Address.swift; sourceTree = "<group>"; };
+		6ECFC6FB219BD2AA009211BA /* NetService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetService.swift; sourceTree = "<group>"; };
+		6ECFC6FC219BD2AA009211BA /* DarwinClient.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DarwinClient.swift; sourceTree = "<group>"; };
 		8933C7891EB5B82A000D00A4 /* NetServiceTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetServiceTests.swift; sourceTree = "<group>"; };
 		AD2FAA261CD0B6D800659CF4 /* NetService.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = NetService.plist; sourceTree = "<group>"; };
 		AD2FAA281CD0B6E100659CF4 /* NetServiceTests.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = NetServiceTests.plist; sourceTree = "<group>"; };
@@ -174,12 +174,12 @@
 		8933C7811EB5B7E0000D00A4 /* Sources */ = {
 			isa = PBXGroup;
 			children = (
-				8933C7841EB5B820000D00A4 /* NetService.swift */,
-				6E74523B21913CE800CE1FCA /* NetServiceClient.swift */,
-				6E74524021913CF500CE1FCA /* NetServiceType.swift */,
-				6E74524521913D0400CE1FCA /* NetServiceDomain.swift */,
-				6E74524F2191596F00CE1FCA /* NetServiceAddress.swift */,
-				6E74524A21913DAB00CE1FCA /* DarwinClient.swift */,
+				6ECFC6FA219BD2AA009211BA /* Address.swift */,
+				6ECFC6F8219BD2A9009211BA /* Client.swift */,
+				6ECFC6FC219BD2AA009211BA /* DarwinClient.swift */,
+				6ECFC6F9219BD2AA009211BA /* Domain.swift */,
+				6ECFC6FB219BD2AA009211BA /* NetService.swift */,
+				6ECFC6F7219BD2A7009211BA /* ServiceType.swift */,
 			);
 			name = Sources;
 			path = ../Sources/NetService;
@@ -382,7 +382,7 @@
 				TargetAttributes = {
 					52D6D97B1BEFF229002C0205 = {
 						CreatedOnToolsVersion = 7.1;
-						LastSwiftMigration = 0800;
+						LastSwiftMigration = 1010;
 					};
 					52D6D9851BEFF229002C0205 = {
 						CreatedOnToolsVersion = 7.1;
@@ -390,15 +390,15 @@
 					};
 					52D6D9E11BEFFF6E002C0205 = {
 						CreatedOnToolsVersion = 7.1;
-						LastSwiftMigration = 0800;
+						LastSwiftMigration = 1010;
 					};
 					52D6D9EF1BEFFFBE002C0205 = {
 						CreatedOnToolsVersion = 7.1;
-						LastSwiftMigration = 0800;
+						LastSwiftMigration = 1010;
 					};
 					52D6DA0E1BF000BD002C0205 = {
 						CreatedOnToolsVersion = 7.1;
-						LastSwiftMigration = 0800;
+						LastSwiftMigration = 1010;
 					};
 					DD7502791C68FCFC006590AF = {
 						CreatedOnToolsVersion = 7.2.1;
@@ -490,12 +490,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				6E7452502191596F00CE1FCA /* NetServiceAddress.swift in Sources */,
-				6E74524121913CF500CE1FCA /* NetServiceType.swift in Sources */,
-				6E74524621913D0400CE1FCA /* NetServiceDomain.swift in Sources */,
-				6E74523C21913CE800CE1FCA /* NetServiceClient.swift in Sources */,
-				8933C7851EB5B820000D00A4 /* NetService.swift in Sources */,
-				6E74524B21913DAB00CE1FCA /* DarwinClient.swift in Sources */,
+				6ECFC701219BD2AA009211BA /* Client.swift in Sources */,
+				6ECFC6FD219BD2AA009211BA /* ServiceType.swift in Sources */,
+				6ECFC70D219BD2AA009211BA /* NetService.swift in Sources */,
+				6ECFC709219BD2AA009211BA /* Address.swift in Sources */,
+				6ECFC705219BD2AA009211BA /* Domain.swift in Sources */,
+				6ECFC711219BD2AA009211BA /* DarwinClient.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -511,12 +511,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				6E7452522191596F00CE1FCA /* NetServiceAddress.swift in Sources */,
-				6E74524321913CF500CE1FCA /* NetServiceType.swift in Sources */,
-				6E74524821913D0400CE1FCA /* NetServiceDomain.swift in Sources */,
-				6E74523E21913CE800CE1FCA /* NetServiceClient.swift in Sources */,
-				8933C7871EB5B820000D00A4 /* NetService.swift in Sources */,
-				6E74524D21913DAB00CE1FCA /* DarwinClient.swift in Sources */,
+				6ECFC703219BD2AA009211BA /* Client.swift in Sources */,
+				6ECFC6FF219BD2AA009211BA /* ServiceType.swift in Sources */,
+				6ECFC70F219BD2AA009211BA /* NetService.swift in Sources */,
+				6ECFC70B219BD2AA009211BA /* Address.swift in Sources */,
+				6ECFC707219BD2AA009211BA /* Domain.swift in Sources */,
+				6ECFC713219BD2AA009211BA /* DarwinClient.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -524,12 +524,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				6E7452532191596F00CE1FCA /* NetServiceAddress.swift in Sources */,
-				6E74524421913CF500CE1FCA /* NetServiceType.swift in Sources */,
-				6E74524921913D0400CE1FCA /* NetServiceDomain.swift in Sources */,
-				6E74523F21913CE800CE1FCA /* NetServiceClient.swift in Sources */,
-				8933C7881EB5B820000D00A4 /* NetService.swift in Sources */,
-				6E74524E21913DAB00CE1FCA /* DarwinClient.swift in Sources */,
+				6ECFC704219BD2AA009211BA /* Client.swift in Sources */,
+				6ECFC700219BD2AA009211BA /* ServiceType.swift in Sources */,
+				6ECFC710219BD2AA009211BA /* NetService.swift in Sources */,
+				6ECFC70C219BD2AA009211BA /* Address.swift in Sources */,
+				6ECFC708219BD2AA009211BA /* Domain.swift in Sources */,
+				6ECFC714219BD2AA009211BA /* DarwinClient.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -537,12 +537,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				6E7452512191596F00CE1FCA /* NetServiceAddress.swift in Sources */,
-				6E74524221913CF500CE1FCA /* NetServiceType.swift in Sources */,
-				6E74524721913D0400CE1FCA /* NetServiceDomain.swift in Sources */,
-				6E74523D21913CE800CE1FCA /* NetServiceClient.swift in Sources */,
-				8933C7861EB5B820000D00A4 /* NetService.swift in Sources */,
-				6E74524C21913DAB00CE1FCA /* DarwinClient.swift in Sources */,
+				6ECFC702219BD2AA009211BA /* Client.swift in Sources */,
+				6ECFC6FE219BD2AA009211BA /* ServiceType.swift in Sources */,
+				6ECFC70E219BD2AA009211BA /* NetService.swift in Sources */,
+				6ECFC70A219BD2AA009211BA /* Address.swift in Sources */,
+				6ECFC706219BD2AA009211BA /* Domain.swift in Sources */,
+				6ECFC712219BD2AA009211BA /* DarwinClient.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -745,6 +745,7 @@
 		52D6D9941BEFF229002C0205 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CLANG_ENABLE_MODULES = YES;
 				INFOPLIST_FILE = Configs/NetServiceTests.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
@@ -758,6 +759,7 @@
 		52D6D9951BEFF229002C0205 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CLANG_ENABLE_MODULES = YES;
 				INFOPLIST_FILE = Configs/NetServiceTests.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
@@ -772,6 +774,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				APPLICATION_EXTENSION_API_ONLY = YES;
+				CLANG_ENABLE_MODULES = YES;
 				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
 				DEFINES_MODULE = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
@@ -783,6 +786,7 @@
 				PRODUCT_NAME = NetService;
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 4.0;
 				TARGETED_DEVICE_FAMILY = 4;
 				WATCHOS_DEPLOYMENT_TARGET = 2.0;
@@ -793,6 +797,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				APPLICATION_EXTENSION_API_ONLY = YES;
+				CLANG_ENABLE_MODULES = YES;
 				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
 				DEFINES_MODULE = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
@@ -815,6 +820,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				APPLICATION_EXTENSION_API_ONLY = YES;
+				CLANG_ENABLE_MODULES = YES;
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
 				DEFINES_MODULE = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
@@ -826,6 +832,7 @@
 				PRODUCT_NAME = NetService;
 				SDKROOT = appletvos;
 				SKIP_INSTALL = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 4.0;
 				TARGETED_DEVICE_FAMILY = 3;
 				TVOS_DEPLOYMENT_TARGET = 9.0;
@@ -836,6 +843,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				APPLICATION_EXTENSION_API_ONLY = YES;
+				CLANG_ENABLE_MODULES = YES;
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
 				DEFINES_MODULE = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
@@ -858,6 +866,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				APPLICATION_EXTENSION_API_ONLY = YES;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "-";
 				COMBINE_HIDPI_IMAGES = YES;
 				DEFINES_MODULE = YES;
@@ -872,6 +881,7 @@
 				PRODUCT_NAME = NetService;
 				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 4.0;
 			};
 			name = Debug;
@@ -880,6 +890,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				APPLICATION_EXTENSION_API_ONLY = YES;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "-";
 				COMBINE_HIDPI_IMAGES = YES;
 				DEFINES_MODULE = YES;
@@ -902,6 +913,7 @@
 		DD7502831C68FCFC006590AF /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_IDENTITY = "-";
 				COMBINE_HIDPI_IMAGES = YES;
 				INFOPLIST_FILE = Configs/NetServiceTests.plist;
@@ -917,6 +929,7 @@
 		DD7502841C68FCFC006590AF /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_IDENTITY = "-";
 				COMBINE_HIDPI_IMAGES = YES;
 				INFOPLIST_FILE = Configs/NetServiceTests.plist;
@@ -933,6 +946,7 @@
 		DD7502961C690C7A006590AF /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				INFOPLIST_FILE = Configs/NetServiceTests.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = org.pureswift.NetServiceTests;
@@ -946,6 +960,7 @@
 		DD7502971C690C7A006590AF /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				INFOPLIST_FILE = Configs/NetServiceTests.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = org.pureswift.NetServiceTests;

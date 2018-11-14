@@ -14,10 +14,13 @@ import Darwin
 import Glibc
 #endif
 
+/// Net Service Address
 public struct NetServiceAddress: Equatable, Hashable {
     
+    /// Network port.
     public let port: UInt16
     
+    /// Network address.
     public let address: Address
     
     public init(port: UInt16, address: Address) {
@@ -184,7 +187,7 @@ extension InternetAddress {
                       $0,
                       socklen_t(Self.stringLength))
         }) else {
-            fatalError("Invalid IPv4 address")
+            fatalError("Invalid \(Self.self) address")
         }
         
         return String(cString: presentationBytes)
