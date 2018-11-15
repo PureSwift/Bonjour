@@ -18,11 +18,7 @@ public final class DarwinNetServiceClient: NSObject, NetServiceClient {
     
     public var log: ((String) -> ())?
     
-    private lazy var netServiceBrowser: NetServiceBrowser = {
-        let netServiceBrowser = NetServiceBrowser()
-        netServiceBrowser.delegate = self
-        return netServiceBrowser
-    }()
+    private var netServiceBrowser: NetServiceBrowser!
     
     private var internalState = InternalState()
     
@@ -39,10 +35,12 @@ public final class DarwinNetServiceClient: NSObject, NetServiceClient {
                                  shouldContinue: () -> Bool,
                                  foundService: @escaping (Service) -> ()) throws {
         
-        // remove previous results for domain and type
+        netServiceBrowser = NetServiceBrowser()
+        netServiceBrowser.delegate = self
+        
+        // remove previous results
         self.internalState.discoverServices.foundService = foundService
-        self.internalState.discoverServices.services = self.internalState.discoverServices.services
-            .filter { ($0.key.type == type && $0.key.domain == domain) == false }
+        self.internalState.discoverServices.services.removeAll(keepingCapacity: true)
         
         // perform search
         netServiceBrowser.searchForServices(ofType: type.rawValue, inDomain: domain.rawValue)
@@ -68,6 +66,11 @@ public final class DarwinNetServiceClient: NSObject, NetServiceClient {
         guard let netService = self.internalState.discoverServices.services[service]
             else { throw NetServiceClientError.invalidService(service) }
         
+        // return cache
+        if let addresses = netService.addresses, addresses.isEmpty == false {
+            return addresses.map { NetServiceAddress(data: $0) }
+        }
+        
         // perform action
         netService.resolve(withTimeout: timeout)
         
@@ -80,7 +83,6 @@ public final class DarwinNetServiceClient: NSObject, NetServiceClient {
         }
         
         if let error = self.internalState.resolveAddress.error {
-            
             throw DarwinNetServiceClientError.notResolveAddress(error)
         }
         
