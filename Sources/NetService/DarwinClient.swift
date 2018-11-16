@@ -214,7 +214,8 @@ internal extension NetServiceAddress {
                 }
             }
             
-            self.init(port: ipv4.sin_port, address: .ipv4(NetServiceAddressIPv4(address: ipv4.sin_addr)))
+            self.init(port: in_port_t(bigEndian: ipv4.sin_port),
+                      address: .ipv4(NetServiceAddressIPv4(address: ipv4.sin_addr)))
             
         case AF_INET6:
             let ipv6 = withUnsafePointer(to: &socketAddress) {
@@ -223,7 +224,8 @@ internal extension NetServiceAddress {
                 }
             }
             
-            self.init(port: ipv6.sin6_port, address: .ipv6(NetServiceAddressIPv6(address: ipv6.sin6_addr)))
+            self.init(port: in_port_t(bigEndian: ipv6.sin6_port),
+                      address: .ipv6(NetServiceAddressIPv6(address: ipv6.sin6_addr)))
             
         default:
             fatalError()
