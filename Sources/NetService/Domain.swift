@@ -29,5 +29,5 @@ public struct NetServiceDomain: RawRepresentable, Equatable, Hashable {
 
 public extension NetServiceDomain {
     
-    public static var local = NetServiceDomain("local.")
+    static let local = NetServiceDomain("local.")
 }

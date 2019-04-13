@@ -30,19 +30,12 @@ public struct NetServiceType: RawRepresentable, Equatable, Hashable {
 
 public extension NetServiceType {
     
-    public static var http = NetServiceType("_http._tcp.")
-    
-    public static var ssh = NetServiceType("_ssh._tcp.")
-    
-    public static var samba = NetServiceType("_smb._tcp.")
-    
-    public static var sftp = NetServiceType("_sftp._tcp.")
-    
-    public static var rfb = NetServiceType("_rfb._tcp.")
-    
-    public static var printer = NetServiceType("_printer._tcp.")
-    
-    public static var scanner = NetServiceType("_scanner._tcp.")
-    
-    public static var itunesSharing = NetServiceType("_daap._tcp.")
+    static let http = NetServiceType("_http._tcp.")
+    static let ssh = NetServiceType("_ssh._tcp.")
+    static let samba = NetServiceType("_smb._tcp.")
+    static let sftp = NetServiceType("_sftp._tcp.")
+    static let rfb = NetServiceType("_rfb._tcp.")
+    static let printer = NetServiceType("_printer._tcp.")
+    static let scanner = NetServiceType("_scanner._tcp.")
+    static let itunesSharing = NetServiceType("_daap._tcp.")
 }

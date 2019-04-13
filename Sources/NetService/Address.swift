@@ -40,7 +40,7 @@ extension NetServiceAddress: CustomStringConvertible {
 
 public extension NetServiceAddress {
     
-    public enum Address: Equatable, Hashable {
+    enum Address: Equatable, Hashable {
         
         case ipv4(NetServiceAddressIPv4)
         case ipv6(NetServiceAddressIPv6)
