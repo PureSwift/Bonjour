@@ -15,7 +15,7 @@ import NetService
 
 #if os(macOS) || os(iOS) || (os(Linux) && !os(Android))
 
-public final class NetServiceClient {
+public final class NetServiceClient: NetServiceClientProtocol {
     
     // MARK: - Properties
     
