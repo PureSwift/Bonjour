@@ -1,6 +1,6 @@
 import XCTest
-@testable import NetServiceTests
+@testable import BonjourTests
 
 XCTMain([
-    testCase(NetServiceTests.allTests),
+    testCase(BonjourTests.allTests),
 ])

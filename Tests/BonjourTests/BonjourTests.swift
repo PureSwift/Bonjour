@@ -8,16 +8,16 @@
 
 import Foundation
 import XCTest
-@testable import NetService
+@testable import Bonjour
 
-final class NetServiceTests: XCTestCase {
+final class BonjourTests: XCTestCase {
     
     static let allTests = [
         ("testIPv4Address", testIPv4Address),
         ("testInvalidIPv4Address", testInvalidIPv4Address),
         ("testIPv6Address", testIPv6Address),
         ("testInvalidIPv6Address", testInvalidIPv6Address)
-        ]
+    ]
     
     func testIPv4Address() {
         
@@ -76,14 +76,12 @@ final class NetServiceTests: XCTestCase {
         strings.forEach { XCTAssertNil(NetServiceAddressIPv6(rawValue: $0)) }
     }
     
-    #if os(macOS)
-    
-    func testDarwinAddressData() {
+    func testAddressData() {
         
         let addressData = [
-            ("192.168.0.110:20480",
+            ("192.168.0.110:80",
              Data([16, 2, 0, 80, 192, 168, 0, 110, 0, 0, 0, 0, 0, 0, 0, 0])),
-            ("fe80::9eae:d3ff:fe97:92c5:20480",
+            ("fe80::9eae:d3ff:fe97:92c5:80",
              Data([28, 30, 0, 80, 0, 0, 0, 0, 254, 128, 0, 0, 0, 0, 0, 0, 158, 174, 211, 255, 254, 151, 146, 197, 5, 0, 0, 0]))
         ]
         
@@ -94,16 +92,18 @@ final class NetServiceTests: XCTestCase {
         }
     }
     
-    func testDarwinClient() {        
+    #if os(macOS)
+        
+    func testClient() {
         
         do {
             
-            let client = DarwinNetServiceClient()
+            let client = NetServiceClient()
             client.log = { print("NetService:", $0) }
             
             var services = Set<Service>()
             let end = Date() + 1.0
-            try client.discoverServices(of: .http,
+            try client.discoverServices(of: .smb,
                                         in: .local,
                                         shouldContinue: { Date() < end },
                                         foundService: { services.insert($0) })

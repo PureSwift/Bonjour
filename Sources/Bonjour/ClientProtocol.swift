@@ -9,7 +9,7 @@
 import Foundation
 
 /// Bonjour Net Service Client
-public protocol NetServiceClient: class {
+public protocol NetServiceClientProtocol: class {
     
     /// Discover services of the specified type in the specified domain.
     func discoverServices(of type: NetServiceType,
@@ -29,5 +29,14 @@ public enum NetServiceClientError: Error {
     
     /// Invalid / Unknown service specified.
     case invalidService(Service)
+    
+    #if os(macOS) || os(iOS)
+    
+    ///
+    case notDiscoverServices([String: NSNumber])
+    
+    ///
+    case notResolveAddress([String: NSNumber])
+    #endif
 }
 

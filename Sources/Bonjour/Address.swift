@@ -33,7 +33,6 @@ public struct NetServiceAddress: Equatable, Hashable {
 extension NetServiceAddress: CustomStringConvertible {
     
     public var description: String {
-        
         return address.description + ":" + port.description
     }
 }
@@ -72,7 +71,6 @@ public struct NetServiceAddressIPv4: NetServiceAddressProtocol, Equatable {
     public let address: in_addr
     
     public init(address: in_addr) {
-        
         self.address = address
     }
 }
@@ -88,7 +86,6 @@ extension NetServiceAddressIPv4: RawRepresentable {
     }
     
     public var rawValue: String {
-        
         return address.presentation
     }
 }
@@ -96,7 +93,6 @@ extension NetServiceAddressIPv4: RawRepresentable {
 extension NetServiceAddressIPv4: CustomStringConvertible {
     
     public var description: String {
-        
         return rawValue
     }
 }
@@ -104,7 +100,6 @@ extension NetServiceAddressIPv4: CustomStringConvertible {
 extension NetServiceAddressIPv4: Hashable {
     
     public var hashValue: Int {
-        
         return unsafeBitCast(address, to: UInt32.self).hashValue
     }
 }
@@ -114,7 +109,6 @@ public struct NetServiceAddressIPv6: NetServiceAddressProtocol {
     public let address: in6_addr
     
     public init(address: in6_addr) {
-        
         self.address = address
     }
 }
@@ -130,7 +124,6 @@ extension NetServiceAddressIPv6: RawRepresentable, Equatable {
     }
     
     public var rawValue: String {
-        
         return address.presentation
     }
 }
@@ -138,7 +131,6 @@ extension NetServiceAddressIPv6: RawRepresentable, Equatable {
 extension NetServiceAddressIPv6: CustomStringConvertible {
     
     public var description: String {
-        
         return rawValue
     }
 }
@@ -146,9 +138,7 @@ extension NetServiceAddressIPv6: CustomStringConvertible {
 extension NetServiceAddressIPv6: Hashable {
     
     public var hashValue: Int {
-        
         let bit128Value = unsafeBitCast(address, to: uuid_t.self)
-        
         return UUID(uuid: bit128Value).hashValue
     }
 }
@@ -206,4 +196,41 @@ extension in6_addr: InternetAddress {
     static var stringLength: Int { return Int(INET6_ADDRSTRLEN) }
     
     static var addressFamily: sa_family_t { return sa_family_t(AF_INET6) }
+}
+
+// MARK: - Data
+
+internal extension NetServiceAddress {
+    
+    init(data: Data) {
+        
+        var socketAddress = sockaddr_storage()
+        data.withUnsafeBytes { socketAddress = $0.pointee }
+        
+        switch Int32(socketAddress.ss_family) {
+        
+        case AF_INET:
+            let ipv4 = withUnsafePointer(to: &socketAddress) {
+                $0.withMemoryRebound(to: sockaddr_in.self, capacity: 1) {
+                    $0.pointee
+                }
+            }
+            
+            self.init(port: in_port_t(bigEndian: ipv4.sin_port),
+                      address: .ipv4(NetServiceAddressIPv4(address: ipv4.sin_addr)))
+            
+        case AF_INET6:
+            let ipv6 = withUnsafePointer(to: &socketAddress) {
+                $0.withMemoryRebound(to: sockaddr_in6.self, capacity: 1) {
+                    $0.pointee
+                }
+            }
+            
+            self.init(port: in_port_t(bigEndian: ipv6.sin6_port),
+                      address: .ipv6(NetServiceAddressIPv6(address: ipv6.sin6_addr)))
+            
+        default:
+            fatalError()
+        }
+    }
 }
