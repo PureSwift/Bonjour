@@ -16,7 +16,9 @@ final class BonjourTests: XCTestCase {
         ("testIPv4Address", testIPv4Address),
         ("testInvalidIPv4Address", testInvalidIPv4Address),
         ("testIPv6Address", testIPv6Address),
-        ("testInvalidIPv6Address", testInvalidIPv6Address)
+        ("testInvalidIPv6Address", testInvalidIPv6Address),
+        ("testAddressData", testAddressData),
+        ("testClient", testClient)
     ]
     
     func testIPv4Address() {
@@ -95,9 +97,7 @@ final class BonjourTests: XCTestCase {
             XCTAssertEqual(address.description, string)
         }
     }
-    
-    #if os(macOS)
-        
+            
     func testClient() {
         
         do {
@@ -123,6 +123,4 @@ final class BonjourTests: XCTestCase {
         }
         catch { XCTFail("\(error)") }
     }
-    
-    #endif
 }

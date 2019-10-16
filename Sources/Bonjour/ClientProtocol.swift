@@ -30,7 +30,7 @@ public enum NetServiceClientError: Error {
     /// Invalid / Unknown service specified.
     case invalidService(Service)
     
-    #if os(macOS) || os(iOS)
+    #if os(macOS) || os(iOS) || canImport(NetService)
     
     ///
     case notDiscoverServices([String: NSNumber])

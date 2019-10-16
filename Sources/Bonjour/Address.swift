@@ -206,10 +206,10 @@ internal extension NetServiceAddress {
         
         var socketAddress = sockaddr_storage()
         data.withUnsafeBytes { socketAddress = $0.pointee }
+        let family = sa_family_t(socketAddress.ss_family)
         
-        switch Int32(socketAddress.ss_family) {
-        
-        case AF_INET:
+        switch family {
+        case sa_family_t(AF_INET):
             let ipv4 = withUnsafePointer(to: &socketAddress) {
                 $0.withMemoryRebound(to: sockaddr_in.self, capacity: 1) {
                     $0.pointee
@@ -219,7 +219,7 @@ internal extension NetServiceAddress {
             self.init(port: in_port_t(bigEndian: ipv4.sin_port),
                       address: .ipv4(NetServiceAddressIPv4(address: ipv4.sin_addr)))
             
-        case AF_INET6:
+        case sa_family_t(AF_INET6):
             let ipv6 = withUnsafePointer(to: &socketAddress) {
                 $0.withMemoryRebound(to: sockaddr_in6.self, capacity: 1) {
                     $0.pointee
@@ -230,7 +230,7 @@ internal extension NetServiceAddress {
                       address: .ipv6(NetServiceAddressIPv6(address: ipv6.sin6_addr)))
             
         default:
-            fatalError()
+            fatalError("Invalid address family: \(family)")
         }
     }
 }

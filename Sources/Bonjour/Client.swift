@@ -9,11 +9,11 @@
 import Foundation
 import Dispatch
 
-#if canImport(Linux)
+#if canImport(NetService)
 import NetService
 #endif
 
-#if os(macOS) || os(iOS) || (os(Linux) && !os(Android))
+#if os(macOS) || os(iOS) || canImport(NetService)
 
 public final class NetServiceClient: NetServiceClientProtocol {
     
@@ -29,9 +29,7 @@ public final class NetServiceClient: NetServiceClientProtocol {
     
     // MARK: - Initialization
     
-    public init() {
-        
-    }
+    public init() { }
     
     // MARK: - Methods
     
