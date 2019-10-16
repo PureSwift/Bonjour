@@ -9,12 +9,6 @@ let package = Package(
             targets: ["Bonjour"]
         )
     ],
-    dependencies: [
-        .package(
-            url: "https://github.com/Bouke/NetService.git",
-            from: "0.7.0"
-        )
-    ],
     targets: [
         .target(
             name: "Bonjour",
@@ -28,5 +22,6 @@ let package = Package(
 )
 
 #if os(Linux)
+package.dependencies.append(.package(url: "https://github.com/Bouke/NetService.git", from: "0.7.0"))
 package.targets.first(where: { $0.name == "Bonjour" })?.dependencies.append("NetService")
 #endif

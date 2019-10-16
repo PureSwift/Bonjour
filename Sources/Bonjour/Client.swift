@@ -9,7 +9,11 @@
 import Foundation
 import Dispatch
 
-#if os(macOS) || os(iOS)
+#if canImport(Linux)
+import NetService
+#endif
+
+#if os(macOS) || os(iOS) || (os(Linux) && !os(Android))
 
 public final class NetServiceClient {
     
