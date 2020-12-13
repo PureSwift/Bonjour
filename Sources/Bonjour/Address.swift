@@ -174,7 +174,7 @@ extension InternetAddress {
         guard let presentationBytes = output.withUnsafeMutableBytes({
             inet_ntop(Int32(Self.addressFamily),
                       &address,
-                      $0,
+                      $0.bindMemory(to: Int8.self).baseAddress!,
                       socklen_t(Self.stringLength))
         }) else {
             fatalError("Invalid \(Self.self) address")
