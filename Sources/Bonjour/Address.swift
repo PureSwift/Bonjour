@@ -204,8 +204,7 @@ internal extension NetServiceAddress {
     
     init(data: Data) {
         
-        var socketAddress = sockaddr_storage()
-        data.withUnsafeBytes { socketAddress = $0.pointee }
+        var socketAddress = data.withUnsafeBytes { $0.bindMemory(to: sockaddr_storage.self).baseAddress!.pointee }
         let family = sa_family_t(socketAddress.ss_family)
         
         switch family {
