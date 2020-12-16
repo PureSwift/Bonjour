@@ -14,11 +14,33 @@ public protocol NetServiceClientProtocol: class {
     /// Discover services of the specified type in the specified domain.
     func discoverServices(of type: NetServiceType,
                           in domain: NetServiceDomain,
-                          shouldContinue: () -> Bool,
                           foundService: @escaping (Service) -> ()) throws
+    
+    /// Stop service discovery.
+    func stopDiscovery()
     
     /// Resolve the address of the specified net service.
     func resolve(_ service: Service, timeout: TimeInterval) throws -> [NetServiceAddress]
+}
+
+public extension NetServiceClientProtocol {
+    
+    @available(*, deprecated)
+    func discoverServices(
+        of type: NetServiceType,
+        in domain: NetServiceDomain,
+        shouldContinue: @escaping () -> Bool,
+        foundService: @escaping (Service) -> ()) throws {
+                
+        DispatchQueue.global().async { [weak self] in
+            while shouldContinue() {
+                sleep(1)
+            }
+            self?.stopDiscovery()
+        }
+        
+        try discoverServices(of: type, in: domain, foundService: foundService)
+    }
 }
 
 /// Net Service Error

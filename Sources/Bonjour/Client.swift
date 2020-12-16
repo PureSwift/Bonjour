@@ -27,6 +27,8 @@ public final class NetServiceClient: NetServiceClientProtocol {
     
     private lazy var delegate = Delegate(self)
     
+    private var isScanning = false
+    
     // MARK: - Initialization
     
     public init() { }
@@ -35,7 +37,6 @@ public final class NetServiceClient: NetServiceClientProtocol {
     
     public func discoverServices(of type: NetServiceType,
                                  in domain: NetServiceDomain,
-                                 shouldContinue: () -> Bool,
                                  foundService: @escaping (Service) -> ()) throws {
         
         netServiceBrowser = NetServiceBrowser()
@@ -45,11 +46,13 @@ public final class NetServiceClient: NetServiceClientProtocol {
         self.internalState.discoverServices.foundService = foundService
         self.internalState.discoverServices.services.removeAll(keepingCapacity: true)
         
+        isScanning = true
+        
         // perform search
         netServiceBrowser?.searchForServices(ofType: type.rawValue, inDomain: domain.rawValue)
         
         // wait
-        while shouldContinue() {
+        while isScanning {
             RunLoop.current.run(until: Date() + 1.0)
         }
         
@@ -59,6 +62,10 @@ public final class NetServiceClient: NetServiceClientProtocol {
         if let error = self.internalState.discoverServices.error {
             throw NetServiceClientError.notDiscoverServices(error)
         }
+    }
+    
+    public func stopDiscovery() {
+        isScanning = false
     }
     
     public func resolve(_ service: Service, timeout: TimeInterval) throws -> [NetServiceAddress] {
@@ -128,6 +135,7 @@ extension NetServiceClient.Delegate: NetServiceBrowserDelegate {
         
         client?.log?("Did not search: \(errorDict)")
         client?.internalState.discoverServices.error = errorDict
+        client?.stopDiscovery()
     }
 
     func netServiceBrowser(_ browser: NetServiceBrowser, didFindDomain domain: String, moreComing: Bool) {
