@@ -22,7 +22,7 @@ public protocol NetServiceClientProtocol: class {
     /// Fetch the TXT record data for the specified service.
     ///
     /// - Parameter service: The service for which cached TXT record will be fetched.
-    func txtRecord(for service: Service) -> Data?
+    func txtRecord(for service: Service) -> TXTRecord?
     
     /// Resolve the address of the specified net service.
     func resolve(_ service: Service, timeout: TimeInterval) throws -> [NetServiceAddress]

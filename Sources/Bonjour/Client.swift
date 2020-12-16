@@ -72,8 +72,11 @@ public final class NetServiceClient: NetServiceClientProtocol {
     /// Fetch the TXT record data for the specified service.
     ///
     /// - Parameter service: The service for which cached TXT record will be fetched.
-    public func txtRecord(for service: Service) -> Data? {
-        return internalState.discoverServices.services[service]?.txtRecordData()
+    public func txtRecord(for service: Service) -> TXTRecord? {
+        return internalState.discoverServices
+            .services[service]?
+            .txtRecordData()
+            .flatMap { TXTRecord(data: $0) }
     }
     
     public func resolve(_ service: Service, timeout: TimeInterval) throws -> [NetServiceAddress] {

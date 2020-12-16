@@ -124,8 +124,8 @@ final class BonjourTests: XCTestCase {
                     print(service.name, $0)
                 }
                 
-                if let txtData = client.txtRecord(for: service) {
-                    print("TXT Record:", String(data: txtData, encoding: .utf8) ?? txtData.description)
+                if let txtRecord = client.txtRecord(for: service) {
+                    print("TXT Record:", txtRecord)
                 }
             }
         }
