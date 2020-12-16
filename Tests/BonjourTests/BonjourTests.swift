@@ -116,8 +116,16 @@ final class BonjourTests: XCTestCase {
                 
                 let addresses = try client.resolve(service, timeout: 10.0)
                 
+                if let hostName = client.hostName(for: service) {
+                    print("Host Name:", hostName)
+                }
+                
                 addresses.forEach {
                     print(service.name, $0)
+                }
+                
+                if let txtData = client.txtRecord(for: service) {
+                    print("TXT Record:", String(data: txtData, encoding: .utf8) ?? txtData.description)
                 }
             }
         }

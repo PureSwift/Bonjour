@@ -64,11 +64,14 @@ public final class NetServiceClient: NetServiceClientProtocol {
         }
     }
     
+    /// Halts a currently running search or resolution.
     public func stopDiscovery() {
         isScanning = false
     }
     
     /// Fetch the TXT record data for the specified service.
+    ///
+    /// - Parameter service: The service for which cached TXT record will be fetched.
     public func txtRecord(for service: Service) -> Data? {
         return internalState.discoverServices.services[service]?.txtRecordData()
     }
@@ -106,6 +109,15 @@ public final class NetServiceClient: NetServiceClientProtocol {
         
         // return value
         return (netService.addresses ?? []).map { NetServiceAddress(data: $0) }
+    }
+    
+    /// A string containing the DNS hostname for the specified service.
+    ///
+    /// - Parameter service: The service for which cached host name will be looked up.
+    ///
+    /// - Note: This value is `nil` until the service has been resolved (when addresses is `non-nil`).
+    public func hostName(for service: Service) -> String? {
+        return internalState.discoverServices.services[service]?.hostName
     }
 }
 

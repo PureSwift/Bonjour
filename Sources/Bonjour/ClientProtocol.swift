@@ -16,14 +16,23 @@ public protocol NetServiceClientProtocol: class {
                           in domain: NetServiceDomain,
                           foundService: @escaping (Service) -> ()) throws
     
-    /// Stop service discovery.
+    /// Halts a currently running search or resolution.
     func stopDiscovery()
     
     /// Fetch the TXT record data for the specified service.
+    ///
+    /// - Parameter service: The service for which cached TXT record will be fetched.
     func txtRecord(for service: Service) -> Data?
     
     /// Resolve the address of the specified net service.
     func resolve(_ service: Service, timeout: TimeInterval) throws -> [NetServiceAddress]
+    
+    /// A string containing the DNS hostname for the specified service.
+    ///
+    /// - Parameter service: The service for which cached host name will be fetched.
+    ///
+    /// - Note: This value is `nil` until the service has been resolved (when addresses is `non-nil`).
+    func hostName(for service: Service) -> String?
 }
 
 public extension NetServiceClientProtocol {
