@@ -19,6 +19,9 @@ public protocol NetServiceClientProtocol: class {
     /// Stop service discovery.
     func stopDiscovery()
     
+    /// Fetch the TXT record data for the specified service.
+    func txtRecord(for service: Service) -> Data?
+    
     /// Resolve the address of the specified net service.
     func resolve(_ service: Service, timeout: TimeInterval) throws -> [NetServiceAddress]
 }

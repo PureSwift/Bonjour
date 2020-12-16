@@ -68,6 +68,11 @@ public final class NetServiceClient: NetServiceClientProtocol {
         isScanning = false
     }
     
+    /// Fetch the TXT record data for the specified service.
+    public func txtRecord(for service: Service) -> Data? {
+        return internalState.discoverServices.services[service]?.txtRecordData()
+    }
+    
     public func resolve(_ service: Service, timeout: TimeInterval) throws -> [NetServiceAddress] {
         
         precondition(timeout > 0.0, "Cannot indefinitely resolve")
