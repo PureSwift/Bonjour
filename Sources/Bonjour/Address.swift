@@ -169,18 +169,25 @@ extension InternetAddress {
     
     var presentation: String {
         
-        var output = Data(count: Int(Self.stringLength))
+        var stringBytes = Data(count: Int(Self.stringLength))
         var address = self
-        guard let presentationBytes = output.withUnsafeMutableBytes({
-            inet_ntop(Int32(Self.addressFamily),
-                      &address,
-                      $0.bindMemory(to: Int8.self).baseAddress!,
-                      socklen_t(Self.stringLength))
+        guard let _ = stringBytes.withUnsafeMutableBytes({
+            inet_ntop(
+                Int32(Self.addressFamily),
+                &address,
+                $0.bindMemory(to: Int8.self).baseAddress!,
+                socklen_t(Self.stringLength)
+            )
         }) else {
             fatalError("Invalid \(Self.self) address")
         }
         
-        return String(cString: presentationBytes)
+        
+        guard let string = stringBytes.withUnsafeBytes({
+            $0.bindMemory(to: Int8.self).baseAddress.flatMap { String(cString: $0) }
+        }) else { fatalError("Invalid string bytes") }
+        
+        return string
     }
 }
 
