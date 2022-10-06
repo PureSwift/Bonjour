@@ -19,13 +19,22 @@ let package = Package(
         .package(
             url: "https://github.com/PureSwift/Socket.git",
             branch: "main"
+        ),
+        .package(
+            url: "https://github.com/Bouke/NetService.git",
+            from: "0.8.1"
         )
     ],
     targets: [
         .target(
             name: "Bonjour",
             dependencies: [
-                "Socket"
+                "Socket",
+                .product(
+                    name: "NetService",
+                    package: "NetService",
+                    condition: .when(platforms: [.linux])
+                )
             ]
         ),
         .testTarget(
@@ -34,8 +43,3 @@ let package = Package(
         )
     ]
 )
-
-#if os(Linux)
-package.dependencies.append(.package(url: "https://github.com/Bouke/NetService.git", from: "0.8.1"))
-package.targets.first(where: { $0.name == "Bonjour" })?.dependencies.append("NetService")
-#endif
