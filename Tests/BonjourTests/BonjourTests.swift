@@ -99,38 +99,41 @@ final class BonjourTests: XCTestCase {
         }
     }
             
-    func testClient() {
-        /*
-        do {
-            
-            let client = NetServiceClient()
-            client.log = { print("NetService:", $0) }
-            
-            var services = Set<Service>()
-            let end = Date() + 1.0
-            try client.discoverServices(of: .smb,
-                                        in: .local,
-                                        shouldContinue: { Date() < end },
-                                        foundService: { services.insert($0) })
-            
-            for service in services {
-                
-                let addresses = try client.resolve(service, timeout: 10.0)
-                
-                if let hostName = client.hostName(for: service) {
+    func testClient() async throws {
+        
+        // create browser
+        let client = NetServiceManager()
+        client.log = { print("NetService:", $0) }
+        
+        // start discovery
+        let stream = client.discoverServices(of: .http, in: .local)
+        Task {
+            try? await Task.sleep(nanoseconds: 2 * 1_000_000_000)
+            stream.stop()
+        }
+        
+        // store scanned services
+        var services = Set<Service>()
+        for try await service in stream {
+            services.insert(service)
+        }
+        
+        // resolve each
+        for service in services {
+            do {
+                let addresses = try await client.resolve(service, timeout: 10.0)
+                if let hostName = await client.hostName(for: service) {
                     print("Host Name:", hostName)
                 }
-                
                 addresses.forEach {
                     print(service.name, $0)
                 }
-                
-                if let txtRecord = client.txtRecord(for: service) {
+                if let txtRecord = await client.txtRecord(for: service) {
                     print("TXT Record:", txtRecord)
                 }
+            } catch {
+                XCTFail(service.name + " " + error.localizedDescription)
             }
         }
-        catch { XCTFail("\(error)") }
-         */
     }
 }

@@ -18,18 +18,32 @@ public final class NetServiceManager: NetServiceManagerProtocol {
     // MARK: - Properties
     
     public var log: ((String) -> ())?
-        
+    
     private let browser: NetServiceBrowser
     
     private var storage = Storage()
     
     private lazy var delegate = Delegate(self)
     
+    private let runloop: RunLoop
+    
     // MARK: - Initialization
     
     public init() {
         self.browser = NetServiceBrowser()
+        let runloop = RunLoop.main
+        self.runloop = runloop
         self.browser.delegate = self.delegate
+        self.browser.schedule(in: runloop, forMode: .default)
+        // run loop
+        Task.detached { [weak self] in
+            while self != nil {
+                await MainActor.run {
+                    runloop.run(until: Date() + 0.1)
+                }
+                try? await Task.sleep(nanoseconds: 1_000_000)
+            }
+        }
     }
     
     // MARK: - Methods
@@ -66,6 +80,7 @@ public final class NetServiceManager: NetServiceManagerProtocol {
             .flatMap { TXTRecord(data: $0) }
     }
     
+    /// Resolve the address of the specified net service.
     public func resolve(_ service: Service, timeout: TimeInterval = 30) async throws -> Set<NetServiceAddress> {
         guard let netService = await self.storage.state.cache.services[service]
             else { throw NetServiceError.invalidService(service) }
@@ -78,6 +93,7 @@ public final class NetServiceManager: NetServiceManagerProtocol {
                 await self.storage.update {
                     // cancel current task
                     $0.operation?.cancel()
+                    $0.operation = .resolve(continuation)
                 }
                 // perform action
                 netService.resolve(withTimeout: timeout)
@@ -117,11 +133,11 @@ extension NetServiceManager.Delegate: NetServiceBrowserDelegate {
     func netServiceBrowserWillSearch(_ browser: NetServiceBrowser) {
         client.log?("Will search")
     }
-
+    
     func netServiceBrowserDidStopSearch(_ browser: NetServiceBrowser) {
         client.log?("Did stop search")
     }
-
+    
     func netServiceBrowser(_ browser: NetServiceBrowser, didNotSearch errorDict: [String : NSNumber]) {
         client.log?("Did not search: \(errorDict)")
         Task {
@@ -138,7 +154,7 @@ extension NetServiceManager.Delegate: NetServiceBrowserDelegate {
     func netServiceBrowser(_ browser: NetServiceBrowser, didFindDomain domain: String, moreComing: Bool) {
         client.log?("Did find domain \(domain)" + (moreComing ? " (more coming)" : ""))
     }
-
+    
     func netServiceBrowser(_ browser: NetServiceBrowser, didFind service: NetService, moreComing: Bool) {
         client.log?("Did find service \(service.type) (\(service.name)) in \(service.domain)" + (moreComing ? " (more coming)" : ""))
         // convert to value
