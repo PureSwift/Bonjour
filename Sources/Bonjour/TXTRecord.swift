@@ -10,7 +10,7 @@ import Foundation
 /// TXT Record
 public struct TXTRecord: Equatable, Hashable {
     
-    public var data: Data
+    public let data: Data
     
     public init(data: Data) {
         self.data = data

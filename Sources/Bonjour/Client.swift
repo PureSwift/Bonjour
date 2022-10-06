@@ -7,111 +7,82 @@
 //
 
 import Foundation
-import Dispatch
-
 #if canImport(NetService)
 import NetService
 #endif
 
 #if os(macOS) || os(iOS) || canImport(NetService)
-
-public final class NetServiceClient: NetServiceClientProtocol {
+/// A network service browser that finds published services on a network using multicast DNS.
+public final class NetServiceManager: NetServiceManagerProtocol {
     
     // MARK: - Properties
     
     public var log: ((String) -> ())?
+        
+    private let browser: NetServiceBrowser
     
-    private var netServiceBrowser: NetServiceBrowser?
-    
-    private var internalState = InternalState()
+    private var storage = Storage()
     
     private lazy var delegate = Delegate(self)
     
-    private var isScanning = false
-    
     // MARK: - Initialization
     
-    public init() { }
+    public init() {
+        self.browser = NetServiceBrowser()
+        self.browser.delegate = self.delegate
+    }
     
     // MARK: - Methods
     
-    public func discoverServices(of type: NetServiceType,
-                                 in domain: NetServiceDomain,
-                                 foundService: @escaping (Service) -> ()) throws {
-        
-        netServiceBrowser = NetServiceBrowser()
-        netServiceBrowser?.delegate = delegate
-        
-        // remove previous results
-        self.internalState.discoverServices.foundService = foundService
-        self.internalState.discoverServices.services.removeAll(keepingCapacity: true)
-        
-        isScanning = true
-        
-        // perform search
-        netServiceBrowser?.searchForServices(ofType: type.rawValue, inDomain: domain.rawValue)
-        
-        // wait
-        while isScanning {
-            RunLoop.current.run(until: Date() + 1.0)
-        }
-        
-        netServiceBrowser?.stop()
-        RunLoop.current.run(until: Date() + 0.1)
-        
-        if let error = self.internalState.discoverServices.error {
-            throw NetServiceClientError.notDiscoverServices(error)
-        }
-    }
-    
-    /// Halts a currently running search or resolution.
-    public func stopDiscovery() {
-        isScanning = false
+    /// Starts a search for services of a particular type within a specific domain.
+    public func discoverServices(
+        of type: NetServiceType,
+        in domain: NetServiceDomain
+    ) -> AsyncNetServiceDiscovery<NetServiceManager> {
+        let priority = Task.currentPriority
+        return AsyncNetServiceDiscovery(bufferSize: 10, onTermination: { [weak self] in
+            self?.browser.stop()
+        }, { continuation in
+            Task(priority: priority) {
+                await self.storage.update {
+                    // cancel current task
+                    $0.operation?.cancel()
+                    // remove previous results
+                    $0.cache.services.removeAll(keepingCapacity: true)
+                    $0.operation = .discovery(continuation)
+                }
+                browser.searchForServices(ofType: type.rawValue, inDomain: domain.rawValue)
+            }
+        })
     }
     
     /// Fetch the TXT record data for the specified service.
     ///
     /// - Parameter service: The service for which cached TXT record will be fetched.
-    public func txtRecord(for service: Service) -> TXTRecord? {
-        return internalState.discoverServices
+    public func txtRecord(for service: Service) async -> TXTRecord? {
+        return await storage.state.cache
             .services[service]?
             .txtRecordData()
             .flatMap { TXTRecord(data: $0) }
     }
     
-    public func resolve(_ service: Service, timeout: TimeInterval) throws -> [NetServiceAddress] {
-        
-        precondition(timeout > 0.0, "Cannot indefinitely resolve")
-        
-        guard let netService = self.internalState.discoverServices.services[service]
-            else { throw NetServiceClientError.invalidService(service) }
-        
-        // return cache
+    public func resolve(_ service: Service, timeout: TimeInterval = 30) async throws -> Set<NetServiceAddress> {
+        guard let netService = await self.storage.state.cache.services[service]
+            else { throw NetServiceError.invalidService(service) }
         if let addresses = netService.addresses, addresses.isEmpty == false {
-            return addresses.map { NetServiceAddress(data: $0) }
+            return Set(addresses.lazy.map { NetServiceAddress(data: $0) })
         }
-        
-        // perform action
-        netService.resolve(withTimeout: timeout)
-        
-        // run loop
-        let end = Date() + timeout
-        while Date() < end
-            && self.internalState.resolveAddress.didResolve == false
-            && self.internalState.resolveAddress.error == nil {
-            RunLoop.current.run(until: Date() + 1.0)
+        let priority = Task.currentPriority
+        return try await withCheckedThrowingContinuation { continuation in
+            Task(priority: priority) {
+                await self.storage.update {
+                    // cancel current task
+                    $0.operation?.cancel()
+                }
+                // perform action
+                netService.resolve(withTimeout: timeout)
+            }
         }
-        
-        if let error = self.internalState.resolveAddress.error {
-            throw NetServiceClientError.notResolveAddress(error)
-        }
-        
-        // make sure the method did not timeout
-        guard self.internalState.resolveAddress.didResolve || Date() < end
-            else { throw NetServiceClientError.timeout }
-        
-        // return value
-        return (netService.addresses ?? []).map { NetServiceAddress(data: $0) }
     }
     
     /// A string containing the DNS hostname for the specified service.
@@ -119,18 +90,21 @@ public final class NetServiceClient: NetServiceClientProtocol {
     /// - Parameter service: The service for which cached host name will be looked up.
     ///
     /// - Note: This value is `nil` until the service has been resolved (when addresses is `non-nil`).
-    public func hostName(for service: Service) -> String? {
-        return internalState.discoverServices.services[service]?.hostName
+    public func hostName(for service: Service) async -> String? {
+        return await storage.state
+            .cache
+            .services[service]?
+            .hostName
     }
 }
 
-internal extension NetServiceClient {
+internal extension NetServiceManager {
     
     final class Delegate: NSObject {
         
-        private weak var client: NetServiceClient?
+        private unowned var client: NetServiceManager
         
-        fileprivate init(_ client: NetServiceClient) {
+        fileprivate init(_ client: NetServiceManager) {
             self.client = client
         }
     }
@@ -138,111 +112,158 @@ internal extension NetServiceClient {
 
 // MARK: - NetServiceBrowserDelegate
 
-extension NetServiceClient.Delegate: NetServiceBrowserDelegate {
+extension NetServiceManager.Delegate: NetServiceBrowserDelegate {
     
     func netServiceBrowserWillSearch(_ browser: NetServiceBrowser) {
-        
-        client?.log?("Will search")
-        client?.internalState.discoverServices.error = nil
+        client.log?("Will search")
     }
 
     func netServiceBrowserDidStopSearch(_ browser: NetServiceBrowser) {
-        
-        client?.log?("Did stop search")
+        client.log?("Did stop search")
     }
 
     func netServiceBrowser(_ browser: NetServiceBrowser, didNotSearch errorDict: [String : NSNumber]) {
-        
-        client?.log?("Did not search: \(errorDict)")
-        client?.internalState.discoverServices.error = errorDict
-        client?.stopDiscovery()
+        client.log?("Did not search: \(errorDict)")
+        Task {
+            await client.storage.update {
+                guard case let .discovery(continuation) = $0.operation else {
+                    return
+                }
+                continuation.finish(throwing: NetServiceError.errorDictionary(errorDict))
+                $0.operation = nil
+            }
+        }
     }
-
+    
     func netServiceBrowser(_ browser: NetServiceBrowser, didFindDomain domain: String, moreComing: Bool) {
-        
-        client?.log?("Did find domain \(domain)" + (moreComing ? " (more coming)" : ""))
+        client.log?("Did find domain \(domain)" + (moreComing ? " (more coming)" : ""))
     }
 
     func netServiceBrowser(_ browser: NetServiceBrowser, didFind service: NetService, moreComing: Bool) {
-        
-        client?.log?("Did find service \(service.type) (\(service.name)) in \(service.domain)" + (moreComing ? " (more coming)" : ""))
-        
-        service.delegate = self
-        
+        client.log?("Did find service \(service.type) (\(service.name)) in \(service.domain)" + (moreComing ? " (more coming)" : ""))
+        // convert to value
         let value = Service(
             domain: NetServiceDomain(rawValue: service.domain),
             type: NetServiceType(rawValue: service.type),
             name: service.name
         )
-        
-        client?.internalState.discoverServices.services[value] = service
-        client?.internalState.discoverServices.foundService?(value)
+        // set delegate
+        service.delegate = self
+        // store values
+        Task {
+            await client.storage.update {
+                // cache value
+                $0.cache.services[value] = service
+                // get current operation
+                guard case let .discovery(continuation) = $0.operation else {
+                    return
+                }
+                // yield value
+                continuation.yield(value)
+            }
+        }
     }
     
     func netServiceBrowser(_ browser: NetServiceBrowser, didRemoveDomain domain: String, moreComing: Bool) {
-        
-        client?.log?("Did remove domain \(domain)" + (moreComing ? " (more coming)" : ""))
-        
+        client.log?("Did remove domain \(domain)" + (moreComing ? " (more coming)" : ""))
         
     }
     
     func netServiceBrowser(_ browser: NetServiceBrowser, didRemove service: NetService, moreComing: Bool) {
-        
-        client?.log?("Did remove service \(service.type) (\(service.name)) in \(service.domain)" + (moreComing ? " (more coming)" : ""))
-        
+        client.log?("Did remove service \(service.type) (\(service.name)) in \(service.domain)" + (moreComing ? " (more coming)" : ""))
         
     }
 }
 
 // MARK: - NetServiceDelegate
 
-extension NetServiceClient.Delegate: NetServiceDelegate {
+extension NetServiceManager.Delegate: NetServiceDelegate {
     
     public func netServiceWillResolve(_ service: NetService) {
-        
-        client?.log?("[\(service.domain)\(service.type)\(service.name)]: Will resolve")
-        client?.internalState.resolveAddress.didResolve = false
-        client?.internalState.resolveAddress.error = nil
+        client.log?("[\(service.domain)\(service.type)\(service.name)]: Will resolve")
     }
     
     public func netServiceDidResolveAddress(_ service: NetService) {
-        
-        client?.log?("[\(service.domain)\(service.type)\(service.name)]: Did resolve")
-        client?.internalState.resolveAddress.didResolve = true
+        client.log?("[\(service.domain)\(service.type)\(service.name)]: Did resolve")
+        Task {
+            await client.storage.update {
+                // get current operation
+                guard case let .resolve(continuation) = $0.operation else {
+                    return
+                }
+                // yield value
+                let addresses = Set((service.addresses ?? []).lazy.map { NetServiceAddress(data: $0) })
+                continuation.resume(returning: addresses)
+                $0.operation = nil
+            }
+        }
     }
     
     public func netService(_ service: NetService, didNotResolve errorDict: [String : NSNumber]) {
-        
-        client?.log?("[\(service.domain)\(service.type)\(service.name)]: Did not resolve \(errorDict)")
-        client?.internalState.resolveAddress.error = errorDict
+        client.log?("[\(service.domain)\(service.type)\(service.name)]: Did not resolve \(errorDict)")
+        Task {
+            await client.storage.update {
+                // get current operation
+                guard case let .resolve(continuation) = $0.operation else {
+                    return
+                }
+                // throw error
+                continuation.resume(throwing: NetServiceError.errorDictionary(errorDict))
+                $0.operation = nil
+            }
+        }
     }
 }
 
-// MARK: - Private Types
+// MARK: - Supporting Types
 
-private extension NetServiceClient {
+internal extension NetServiceManager {
     
-    struct InternalState {
-        
-        var discoverServices = DiscoverServices()
-        
-        struct DiscoverServices {
-            
-            var services = [Service: NetService]()
-            
-            var foundService: ((Service) -> ())?
-            
-            var error: [String: NSNumber]?
+    enum Operation {
+        case discovery(AsyncIndefiniteStream<Service>.Continuation)
+        case resolve(CheckedContinuation<Set<NetServiceAddress>, Error>)
+    }
+}
+
+internal extension NetServiceManager.Operation {
+    
+    func cancel() {
+        switch self {
+        case let .discovery(continuation):
+            continuation.finish(throwing: CancellationError())
+        case let .resolve(continuation):
+            continuation.resume(throwing: CancellationError())
         }
+    }
+}
+
+internal extension NetServiceManager {
+    
+    actor Storage {
         
-        var resolveAddress = ResolveAddress()
+        var state = State()
         
-        struct ResolveAddress {
-            
-            var didResolve: Bool = false
-            
-            var error: [String: NSNumber]?
+        func update<T>(_ block: (inout State) throws -> (T)) rethrows -> T {
+            try block(&self.state)
         }
+    }
+}
+
+internal extension NetServiceManager {
+    
+    struct Cache {
+        
+        var services = [Service: NetService]()
+    }
+}
+
+internal extension NetServiceManager {
+    
+    struct State {
+        
+        var cache = Cache()
+        
+        var operation: Operation?
     }
 }
 

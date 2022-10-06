@@ -9,7 +9,7 @@
 import Foundation
 
 /// Net Service Domain
-public struct NetServiceDomain: RawRepresentable, Equatable, Hashable {
+public struct NetServiceDomain: RawRepresentable, Equatable, Hashable, Codable, Sendable {
     
     public let rawValue: String
     
