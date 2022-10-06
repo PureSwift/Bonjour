@@ -1,14 +1,14 @@
 //
-//  AsyncNetServiceDiscovery.swift
+//  AsyncNetServiceDomainDiscovery.swift
 //  
 //
 //  Created by Alsey Coleman Miller on 10/5/22.
 //
 
-/// Async stream of discovered net services.
-public struct AsyncNetServiceDiscovery: AsyncSequence {
+/// Async stream of discovered domains net services.
+public struct AsyncNetServiceDomainDiscovery: AsyncSequence {
     
-    public typealias Element = Service
+    public typealias Element = NetServiceDomain
     
     let stream: AsyncIndefiniteStream<Element>
     
@@ -41,7 +41,7 @@ public struct AsyncNetServiceDiscovery: AsyncSequence {
     }
 }
 
-public extension AsyncNetServiceDiscovery {
+public extension AsyncNetServiceDomainDiscovery {
     
     func first() async throws -> Element? {
         for try await element in self {

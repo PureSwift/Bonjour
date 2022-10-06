@@ -27,6 +27,20 @@ public final class NetServiceManager: NetServiceManagerProtocol {
     
     private let runloop: RunLoop
     
+    /// All discovered services.
+    public var services: Set<Service> {
+        get async {
+            return await Set(storage.state.cache.services.keys)
+        }
+    }
+    
+    /// All discovered domains.
+    public var domains: Set<NetServiceDomain> {
+        get async {
+            return await storage.state.cache.domains
+        }
+    }
+    
     // MARK: - Initialization
     
     public init() {
@@ -52,20 +66,39 @@ public final class NetServiceManager: NetServiceManagerProtocol {
     public func discoverServices(
         of type: NetServiceType,
         in domain: NetServiceDomain
-    ) -> AsyncNetServiceDiscovery<NetServiceManager> {
+    ) -> AsyncNetServiceDiscovery {
         let priority = Task.currentPriority
-        return AsyncNetServiceDiscovery(bufferSize: 10, onTermination: { [weak self] in
+        return AsyncNetServiceDiscovery(bufferSize: 100, onTermination: { [weak self] in
             self?.browser.stop()
         }, { continuation in
             Task(priority: priority) {
                 await self.storage.update {
                     // cancel current task
-                    $0.operation?.cancel()
+                    $0.continuation?.cancel()
                     // remove previous results
                     $0.cache.services.removeAll(keepingCapacity: true)
-                    $0.operation = .discovery(continuation)
+                    $0.continuation = .discoverServices(continuation)
                 }
                 browser.searchForServices(ofType: type.rawValue, inDomain: domain.rawValue)
+            }
+        })
+    }
+    
+    /// Initiates a search for domains visible to the host.
+    public func discoverDomains() -> AsyncNetServiceDomainDiscovery {
+        let priority = Task.currentPriority
+        return AsyncNetServiceDomainDiscovery(bufferSize: 100, onTermination: { [weak self] in
+            self?.browser.stop()
+        }, { continuation in
+            Task(priority: priority) {
+                await self.storage.update {
+                    // cancel current task
+                    $0.continuation?.cancel()
+                    // remove previous results
+                    $0.cache.services.removeAll(keepingCapacity: true)
+                    $0.continuation = .discoverDomains(continuation)
+                }
+                browser.searchForBrowsableDomains()
             }
         })
     }
@@ -81,7 +114,7 @@ public final class NetServiceManager: NetServiceManagerProtocol {
     }
     
     /// Resolve the address of the specified net service.
-    public func resolve(_ service: Service, timeout: TimeInterval = 30) async throws -> Set<NetServiceAddress> {
+    public func resolve(_ service: Service, timeout: TimeInterval = 1.0) async throws -> Set<NetServiceAddress> {
         guard let netService = await self.storage.state.cache.services[service]
             else { throw NetServiceError.invalidService(service) }
         if let addresses = netService.addresses, addresses.isEmpty == false {
@@ -92,8 +125,8 @@ public final class NetServiceManager: NetServiceManagerProtocol {
             Task(priority: priority) {
                 await self.storage.update {
                     // cancel current task
-                    $0.operation?.cancel()
-                    $0.operation = .resolve(continuation)
+                    $0.continuation?.cancel()
+                    $0.continuation = .resolve(continuation)
                 }
                 // perform action
                 netService.resolve(withTimeout: timeout)
@@ -142,27 +175,37 @@ extension NetServiceManager.Delegate: NetServiceBrowserDelegate {
         client.log?("Did not search: \(errorDict)")
         Task {
             await client.storage.update {
-                guard case let .discovery(continuation) = $0.operation else {
+                guard case let .discoverDomains(continuation) = $0.continuation else {
                     return
                 }
                 continuation.finish(throwing: NetServiceError.errorDictionary(errorDict))
-                $0.operation = nil
+                $0.continuation = nil
             }
         }
     }
     
     func netServiceBrowser(_ browser: NetServiceBrowser, didFindDomain domain: String, moreComing: Bool) {
         client.log?("Did find domain \(domain)" + (moreComing ? " (more coming)" : ""))
+        // store values
+        let domain = NetServiceDomain(rawValue: domain)
+        Task {
+            await client.storage.update {
+                // cache value
+                $0.cache.domains.insert(domain)
+                // get current operation
+                guard case let .discoverDomains(continuation) = $0.continuation else {
+                    return
+                }
+                // yield value
+                continuation.yield(domain)
+            }
+        }
     }
     
     func netServiceBrowser(_ browser: NetServiceBrowser, didFind service: NetService, moreComing: Bool) {
         client.log?("Did find service \(service.type) (\(service.name)) in \(service.domain)" + (moreComing ? " (more coming)" : ""))
         // convert to value
-        let value = Service(
-            domain: NetServiceDomain(rawValue: service.domain),
-            type: NetServiceType(rawValue: service.type),
-            name: service.name
-        )
+        let value = Service(service)
         // set delegate
         service.delegate = self
         // store values
@@ -171,7 +214,7 @@ extension NetServiceManager.Delegate: NetServiceBrowserDelegate {
                 // cache value
                 $0.cache.services[value] = service
                 // get current operation
-                guard case let .discovery(continuation) = $0.operation else {
+                guard case let .discoverServices(continuation) = $0.continuation else {
                     return
                 }
                 // yield value
@@ -182,12 +225,21 @@ extension NetServiceManager.Delegate: NetServiceBrowserDelegate {
     
     func netServiceBrowser(_ browser: NetServiceBrowser, didRemoveDomain domain: String, moreComing: Bool) {
         client.log?("Did remove domain \(domain)" + (moreComing ? " (more coming)" : ""))
-        
+        Task {
+            await client.storage.update {
+                $0.cache.domains.remove(.init(rawValue: domain))
+            }
+        }
     }
     
     func netServiceBrowser(_ browser: NetServiceBrowser, didRemove service: NetService, moreComing: Bool) {
         client.log?("Did remove service \(service.type) (\(service.name)) in \(service.domain)" + (moreComing ? " (more coming)" : ""))
-        
+        let value = Service(service)
+        Task {
+            await client.storage.update {
+                $0.cache.services[value] = service
+            }
+        }
     }
 }
 
@@ -204,13 +256,13 @@ extension NetServiceManager.Delegate: NetServiceDelegate {
         Task {
             await client.storage.update {
                 // get current operation
-                guard case let .resolve(continuation) = $0.operation else {
+                guard case let .resolve(continuation) = $0.continuation else {
                     return
                 }
                 // yield value
                 let addresses = Set((service.addresses ?? []).lazy.map { NetServiceAddress(data: $0) })
                 continuation.resume(returning: addresses)
-                $0.operation = nil
+                $0.continuation = nil
             }
         }
     }
@@ -220,14 +272,25 @@ extension NetServiceManager.Delegate: NetServiceDelegate {
         Task {
             await client.storage.update {
                 // get current operation
-                guard case let .resolve(continuation) = $0.operation else {
+                guard case let .resolve(continuation) = $0.continuation else {
                     return
                 }
                 // throw error
                 continuation.resume(throwing: NetServiceError.errorDictionary(errorDict))
-                $0.operation = nil
+                $0.continuation = nil
             }
         }
+    }
+}
+
+internal extension Service {
+    
+    init(_ service: NetService) {
+        self.init(
+            domain: NetServiceDomain(rawValue: service.domain),
+            type: NetServiceType(rawValue: service.type),
+            name: service.name
+        )
     }
 }
 
@@ -235,17 +298,20 @@ extension NetServiceManager.Delegate: NetServiceDelegate {
 
 internal extension NetServiceManager {
     
-    enum Operation {
-        case discovery(AsyncIndefiniteStream<Service>.Continuation)
+    enum Continuation {
+        case discoverServices(AsyncIndefiniteStream<Service>.Continuation)
+        case discoverDomains(AsyncIndefiniteStream<NetServiceDomain>.Continuation)
         case resolve(CheckedContinuation<Set<NetServiceAddress>, Error>)
     }
 }
 
-internal extension NetServiceManager.Operation {
+internal extension NetServiceManager.Continuation {
     
     func cancel() {
         switch self {
-        case let .discovery(continuation):
+        case let .discoverServices(continuation):
+            continuation.finish(throwing: CancellationError())
+        case let .discoverDomains(continuation):
             continuation.finish(throwing: CancellationError())
         case let .resolve(continuation):
             continuation.resume(throwing: CancellationError())
@@ -270,6 +336,8 @@ internal extension NetServiceManager {
     struct Cache {
         
         var services = [Service: NetService]()
+        
+        var domains = Set<NetServiceDomain>()
     }
 }
 
@@ -279,7 +347,7 @@ internal extension NetServiceManager {
         
         var cache = Cache()
         
-        var operation: Operation?
+        var continuation: Continuation?
     }
 }
 

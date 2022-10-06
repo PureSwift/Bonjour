@@ -11,12 +11,21 @@ import Foundation
 /// Bonjour Net Service Client
 public protocol NetServiceManagerProtocol: AnyObject {
     
+    /// All discovered services.
+    var services: Set<Service> { get async }
+    
+    /// All discovered domains.
+    var domains: Set<NetServiceDomain> { get async }
+    
     /// Discover services of the specified type in the specified domain.
     /// Starts a search for services of a particular type within a specific domain.
     func discoverServices(
         of type: NetServiceType,
         in domain: NetServiceDomain
-    ) -> AsyncNetServiceDiscovery<Self>
+    ) -> AsyncNetServiceDiscovery
+    
+    /// Initiates a search for domains visible to the host.
+    func discoverDomains() -> AsyncNetServiceDomainDiscovery
     
     /// Fetch the TXT record data for the specified service.
     ///
