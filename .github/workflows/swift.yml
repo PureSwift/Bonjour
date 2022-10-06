@@ -8,8 +8,7 @@ jobs:
     strategy:
       matrix:
         swift: [5.6.3, 5.7]
-        os: [ubuntu-20.04]
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-20.04
     steps:
     - name: Install Swift
       uses: slashmo/install-swift@v0.3.0
@@ -21,23 +20,6 @@ jobs:
       run: swift --version
     - name: Install dependencies
       run: sudo apt-get install -y libavahi-compat-libdnssd-dev
-    - name: Build (Debug)
-      run: swift build -c debug
-    - name: Build (Release)
-      run: swift build -c release
-    - name: Test (Debug)
-      run: swift test --configuration debug
-    - name: Test (Release)
-      run: swift test --configuration release -Xswiftc -enable-testing
-
-  build-macOS:
-    name: Build macOS
-    runs-on: macos-latest
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v2
-    - name: Swift Version
-      run: swift --version
     - name: Build (Debug)
       run: swift build -c debug
     - name: Build (Release)
