@@ -13,6 +13,7 @@ import Socket
 
 final class BonjourTests: XCTestCase {
     
+    #if os(macOS)
     func testAddressData() {
         
         let addressData = [
@@ -32,6 +33,7 @@ final class BonjourTests: XCTestCase {
             XCTAssertEqual(address.description, string)
         }
     }
+    #endif
             
     func testClient() async throws {
         
