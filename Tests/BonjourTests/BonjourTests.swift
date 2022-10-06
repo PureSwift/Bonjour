@@ -34,8 +34,21 @@ final class BonjourTests: XCTestCase {
         }
     }
     #endif
-            
-    func testClient() async throws {
+
+    func testClient() {
+        Task {
+            do {
+                try await _testClient()
+            } catch {
+                XCTFail(error.localizedDescription)
+            }
+        }
+        assert(Thread.isMainThread)
+        let end = Date() + 3
+        RunLoop.main.run(mode: .default, before: end)
+    }
+    
+    private func _testClient() async throws {
         
         // create browser
         let client = NetServiceManager()
@@ -53,7 +66,7 @@ final class BonjourTests: XCTestCase {
         for try await service in stream {
             services.insert(service)
         }
-        
+
         // resolve each
         for service in services {
             do {

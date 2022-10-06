@@ -24,9 +24,7 @@ public final class NetServiceManager: NetServiceManagerProtocol {
     private var storage = Storage()
     
     private lazy var delegate = Delegate(self)
-    
-    private let runloop: RunLoop
-    
+        
     /// All discovered services.
     public var services: Set<Service> {
         get async {
@@ -45,11 +43,11 @@ public final class NetServiceManager: NetServiceManagerProtocol {
     
     public init() {
         self.browser = NetServiceBrowser()
-        let runloop = RunLoop.main
-        self.runloop = runloop
         self.browser.delegate = self.delegate
+        #if !canImport(NetService)
+        let runloop = RunLoop.main
         self.browser.schedule(in: runloop, forMode: .default)
-        // run loop
+         // run loop
         Task.detached { [weak self] in
             while self != nil {
                 await MainActor.run {
@@ -58,6 +56,7 @@ public final class NetServiceManager: NetServiceManagerProtocol {
                 try? await Task.sleep(nanoseconds: 1_000_000)
             }
         }
+        #endif
     }
     
     // MARK: - Methods
