@@ -19,6 +19,8 @@ jobs:
       uses: actions/checkout@v2
     - name: Swift Version
       run: swift --version
+    - name: Install dependencies
+      run: sudo apt-get install -y libavahi-compat-libdnssd-dev
     - name: Build (Debug)
       run: swift build -c debug
     - name: Build (Release)
